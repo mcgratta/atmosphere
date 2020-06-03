@@ -98,18 +98,55 @@ $^{2}$ \quad U.S. Forest Service, Seattle, Washington, USA}
 
 \section{Introduction}
 
-The work of Mell et al.~\cite{Mell:IJWF2007}.
+% Motivation.
+In the last decades, wild land and wild land-urban interface (WUI) fires have received substantial attention due to their destructive nature and extensive cost in lives and property~\cite{thomas_2017,mcdermott_2019,boghani_2019,richards_2020}. Over the years, modeling and simulation activities of such phenomena have been tailored to the needs of planners, scientists and first responders, and by the available computing capabilities.
+% Wildfire modeling in the literature.
+A large body of literature can be found on the subject. See for example reviews~\cite{Papadopoulos_2011,Bakhshaii_2019,mcdermott_2019} on classical and new models with associated software. Due to inherent complex nature of the problem, most models of wildfires have historically relied on simplified field-tested rules and correlations. 
+
+Among these, the fire spread model by Rothermel~\cite{Rothermel:1972} assumes quasi-steady state ground fire conditions and takes as inputs fuel properties, wind, terrain slope and moisture that can be measured in situ. 
+Fuel models have been cataloged~\cite{Anderson:1982}, and their input parameters defined in a manner the user can select and combine the most appropriate listed fuels for her case of study. Rothermels fire line model is a widely used wildfire spread model, and has been implemented in several simulation tools~\cite{Finney:FARSITE,Bova:IJWF2015,mcgratta_2013} \textbf{OTHERS?}, enabling a range of planning and operational forecasting capabilities. 
+
+% Level set as a simplified fire spread model, operational forecasting.
+Evolution of wild land fires is usually tied to a fire front, which can have a complex shape moving/deforming with the local flame spread velocities. Knowing the location of this fire front and local properties of the fire, fuel and terrain allows, by use of simplified models like Rothermels, to predict local ignition and fire spread. When modeling the problem numerically, identifying such fire front at a given moment in time requires a mathematical representation and an associated discretization or mesh. The Lagrangian treatment of the motion of a fire front requires specifying a set of control markers and connectivity that define and move with such front. Therefore, the fire front is represented by this discrete mesh. For example, if the domain of motion is a surface terrain, this Lagrangian mesh can be a polygon that moves with the front along this surface~\cite{Finney:FARSITE,Bova:IJWF2015}. 
+On the other hand, an Eulerian representation of motion allows for the mesh to be fixed in space (i.e. in a terrain a polygonal patch mesh of said terrain). Then, the location of the fire front can be portrayed implicitly by using a scalar field defined in the fixed two dimensional mesh. This scalar field is called level set function and numerical methods that evolve it in time are called Level Set Methods (LSM)~\cite{Sethian:1999,Osher:2006}. Some wildfire solvers that use LSM to track the fire front are described in references~\cite{coen_2013,Bova:IJWF2015,mcgratta_2013,LAUTENBERGER_2013}. A practical comparison of the two techniques as implemented in WFDS~\cite{Mell:IJWF2007} and FARSITE~\cite{Finney:FARSITE} is provided in reference~\cite{Bova:IJWF2015}.
+
+% Resolving the flow features on terrains using LES over complex terrains. Describe what we do, FDS, cut-cell schemes, immersed boundary methods.
+As the rate of spread of the front line is dependent in the local velocity on empirical fire spread models like Rothermels, a better local resolution of the velocity field around complex terrains should be beneficial to the accuracy of the overall model. In reality, besides the obstructive character of the terrain itself, compounded effects due to the fire affect the local velocity field. \textbf{Some of these are ...}.
+The de facto physics-based technique for practical simulation of outdoor flows is Large Eddy Simulation (LES)~\cite{coen_2013,mcgratta_2013}. Within FDS~\cite{mcgratta_2013},  the filtered Navier-Stokes equations for buoyant, combusting flows are evolved using a Low Mach approximation. Chemical species are handled using scalar transport equations. Energy transport is accounted for by means of the solution of radiative transport equations and a thermodynamic divergence proxy. \textbf{Comment on WFDS for LOF. The work of Mell et al.~\cite{Mell:IJWF2007}.}.
+
+% Unstructured geometries, capability can be tuned for use with LOF and fire spread models.
+% What has been done, cut-cell scheme IBM, connection to LS and Rothermels, wind.
+Lately, substantial work has been done to add to FDS the option of simulating flows around unstructured geometries. These are represented by surface triangulations which is a typical representation in computer aided design (CAD) and simulation software. This added flexibility is still compliant with the structured cartesian grids and differentiation schemes within FDS. We implemented a cut-cell scheme~\cite{berger_2016} to advance the scalar transport and energy of multicomponent mixtures on the polyhedra next to the geometries. These polyhedrons arise from geometry intersection with the cartesian fluid grid. As geometry boundaries are not changed, the method has the property of exact volume and area conservation. Velocities next to geometries are reconstructed using an immersed boundary method (IBM)~\cite{fadlun_2000,balaras_2004} coupled with an equilibrium wall model for turbulent flows~\cite{mcdermo_2018}. Variables related to IBM forcing and heat transfer modeling at the wall are sampled through interpolation and a normal probe approach~\cite{balaras_2004}. Also, radiation transport boundary conditions have been adapted to this technique. 
+For fire simulation over complex terrains a range of options in terms of physics fidelity of the model are being developed, in particular, in the representation of fire spread. For fast simulation of outdoor fires, this new capability has been interfaced with a Level Set scheme~\cite{Bova:IJWF2015} and Rothermels fire spread model. The wind speed input for Rothermels model results from the local velocity over the terrain which is affected by fire buoyancy and flow evolution. These are in turn also influenced by wind atmospheric conditions, accounted for within simulations using a mean wind forcing concept.  
+
+% Outline of the manuscript.
+In the following section a description on the mathematical model for fire over terrain is provided. The terrain description and model discretization is provided in section~\ref{sec:terraindisc}. An account of the fire spread model is given in section~\ref{sec:firespread}, as well as the wind atmospheric boundary conditions in section~\ref{sec:wind}. Numerical experiments testing the methodology on a simple example and a real case of fire in Cogoleto, Italy are provided in section~\ref{sec:numexp}. Finally a summary of this work is outlined in section~\ref{sec:summary}.
 
 
-\section{The Mean Forcing Concept}
+\section{Mathematical model} \label{sec:matmodel}
 
-The process of steering the solution of the mass, momentum, and energy equations to match wind speed and direction gathered at random weather stations is known as \emph{data assimilation}~\cite{Kalnay:2003}. FDS uses a relatively simple data assimilation technique, a method known as \emph{nudging}, where you add a forcing term to the momentum equation to ``nudge'' the flow in the direction of the specified wind. FDS automatically drives the mean velocity components toward the desired values by adding a forcing term to the momentum equation. For example, the $u$ component equation is modified as follows:
-\begin{equation}
-   \frac{\partial u}{\partial t} + \ldots = \frac{u_0(z,t)-\overline{u}(z,t)}{\tau} \label{mean_forcing_u}
-\end{equation}
-Here, $u(\mathbf{x},t)$ is the computed velocity component, $u_0$ is the specified wind field component that can vary with height and time, and $\overline{u}$ is the average of the computed velocity component at the height $z$. The relaxation time scale, $\tau$, is an important parameter. The shorter this time scale, the faster the flow field will ``catch up'' to the mean wind, but at the expense of possibly washing out important flow structures. There is no firm guidance in the atmospheric modeling literature.
+% Model equations, fluid side : scalar transport, momentum, energy. Stratification.
 
-\section{Wildland Fire Spread}
+
+
+
+% Combustion, fuel, fire spread model equations.
+
+
+\section{Terrain description and discretization} \label{sec:terraindisc}
+
+
+% How do we describe terrains - geometries. Methodology to get from DEM a geometry.
+
+
+% What FDS does for Scalar Transport - 1 paragraph Modification close to the terrain surface: scalar transport, momentum, divergence.
+
+
+% Connection with level set fire spread.
+
+
+
+\section{Wildland Fire Spread} \label{sec:firespread}
 
 There are three ways of simulating wildland fire spread.
 
@@ -119,6 +156,40 @@ There are three ways of simulating wildland fire spread.
 \item {\bf Level Set Method:} The fire front propagates using purely empirical rules.
 \end{enumerate}
 The Particle Method and Boundary Fuel Model require thermo-physical properties of the vegetative fuels and the fire spread rate is {\em predicted} by the model. The Level Set Method relies on a set of experimentally-determined spread rates for different types of vegetation and wind speeds.
+
+
+% Here, methodology to get fuels in the terrain from online sources.
+
+
+
+
+% Defining atmospheric conditions:
+\section{Defining atmospheric wind : The Mean Forcing Concept} \label{sec:wind}
+
+The process of steering the solution of the mass, momentum, and energy equations to match wind speed and direction gathered at random weather stations is known as \emph{data assimilation}~\cite{Kalnay:2003}. FDS uses a relatively simple data assimilation technique, a method known as \emph{nudging}, where you add a forcing term to the momentum equation to ``nudge'' the flow in the direction of the specified wind. FDS automatically drives the mean velocity components toward the desired values by adding a forcing term to the momentum equation. For example, the $u$ component equation is modified as follows:
+\begin{equation}
+   \frac{\partial u}{\partial t} + \ldots = \frac{u_0(z,t)-\overline{u}(z,t)}{\tau} \label{mean_forcing_u}
+\end{equation}
+Here, $u(\mathbf{x},t)$ is the computed velocity component, $u_0$ is the specified wind field component that can vary with height and time, and $\overline{u}$ is the average of the computed velocity component at the height $z$. The relaxation time scale, $\tau$, is an important parameter. The shorter this time scale, the faster the flow field will ``catch up'' to the mean wind, but at the expense of possibly washing out important flow structures. There is no firm guidance in the atmospheric modeling literature.
+
+
+\section{Numerical Experiments} \label{sec:numexp}
+
+
+
+
+
+\subsection{Simple example}  \label{sec:simexp}
+
+
+
+
+\subsection{Cogoleto Fire}  \label{sec:cogo}
+
+
+
+
+\section{Summary} \label{sec:summary}
 
 
 
