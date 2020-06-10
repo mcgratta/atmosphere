@@ -296,24 +296,61 @@ can be computed and used in equation~\eqref{it:FSPoisson} to take into account t
 
 \section{Wildland Fire Spread} \label{sec:firespread}
 
-There are three ways of simulating wildland fire spread.
-
+There are various ways of simulating wildland fire spread depending on the resolution of the underlying numerical grid. 
 \begin{enumerate}
-\item {\bf Particle Method:} The vegetation is represented by a collection of Lagrangian particles that are heated via convection and radiation.
-\item {\bf Boundary Fuel Model:} Ground vegetation is modeled like a porous solid with a thickness equal to the height of the vegetation.
-\item {\bf Level Set Method:} The fire front propagates using purely empirical rules.
+\item {\bf Particle Model:} The vegetation is represented by a collection of Lagrangian particles that are heated via convection and radiation. This model is appropriate for grid resolution of the order of 1~m or less.
+\item {\bf Boundary Fuel Model:} Ground vegetation is modeled like a porous solid with a thickness equal to the height of the vegetation. This model is appropriate for grid resolution of the order of 1~m to 10~m.
+\item {\bf Level Set Method:} The fire front propagates using purely empirical rules. This model is appropriate for grid resolution of the order of roughly 10~m and greater. 
 \end{enumerate}
 The Particle Method and Boundary Fuel Model require thermo-physical properties of the vegetative fuels and the fire spread rate is {\em predicted} by the model. The Level Set Method relies on a set of experimentally-determined spread rates for different types of vegetation and wind speeds.
 
-\subsection{Particle Method}
+\subsection{Particle Model}
 
-Lagrangian particles can be used to represent different types of vegetation, like leaves, grass, and so on. In practice each type of vegetation is represented by a single particle in each computational grid cell. Most often the particle is assumed to be cylindrical in shape. The particle is assigned a diameter based on the measured surface area to volume ratio, $\sigma$. The length is relatively unimportant so long as it is assumed to be much greater than the diameter. Material properties are assigned for the wet vegetation which is assumed to dry, decompose to char, and then exothermally oxidize when exposed to heat from an oncoming fire. The drag force exerted by the collection of particles is given by:
+Lagrangian particles can be used to represent different types of vegetation, like leaves, grass, and so on. In the model each type of vegetation is represented by a single particle in each computational grid cell. Most often the particle is assumed to be cylindrical in shape. The particle is assigned a diameter based on the measured surface area to volume ratio, $\sigma$. The length is relatively unimportant so long as it is assumed to be much greater than the diameter. Material properties are assigned for the wet vegetation which is assumed to dry, decompose to char, and then exothermally oxidize when exposed to heat from an oncoming fire. The drag force exerted by the collection of particles is given by:
 \begin{equation}
    \mathbf{f}_{\rm b} = \frac{\rho}{2} \, C_{\rm d} \, C_{\rm s} \, \beta \, \sigma \, \mathbf{u} \, ||\mathbf{u}||
+   \label{drag}
 \end{equation}
 where $\rho$ is the air density, $C_{\rm d}$ is the drag coefficient, $C_{\rm s}$ is the shape factor (ratio of projected area to surface area), $\beta$ is the packing ratio, $\sigma$ is the surface area to volume ratio, and $\mathbf{u}$ is the air velocity. The diameter is specified via the surface area to volume ratio, $\sigma=2/r$ for a cylinder. The packing ratio is the volume of solid needles divided by the volume they occupy, typically denoted $\beta$. It is calculated by dividing the dry mass of vegetation per unit volume, the so-called ``bulk density,'' by the density of the dry vegetation, $\rho_{\rm d}$.
 
 A coniferous tree (e.g. pine, spruce, fir) can be represented in FDS as a collection of Lagrangian particles forming a large cone. The trunk and heavier branches are typically neglected.
+
+
+\subsection{Boundary Fuel Model}
+
+In many simulations of wildland fire, the ground vegetation layer is too shallow to be resolved explicitly, as is done when using Lagrangian particles to represent the vegetation. In such cases, the ground vegetation can be modeled as a porous boundary consisting of a layer of dry vegetation, moisture, and air, underneath of which is hard ground~\cite{Perez-Ramirez:FT2017}. The drag exerted by the vegetation is modeled using a special velocity boundary condition, and convective heat transfer is modeled via a source term in the one-dimensional heat conduction equation that is solved through the layer of vegetation and solid ground. Thermal radiation penetrates the vegetation layer via a 1-D radiative transport equation that is used for semi-transparent solids.
+
+The Boundary Fuel and Particle Models share the same basic input parameters and pyrolyis model. The drag exerted on the wind flowing through the vegetation is imposed as a force term in the gas phase grid cell adjacent to the boundary:
+\begin{equation}
+    \mathbf{f}_{\rm b} = \frac{\rho}{2} \, C_{\rm d} \, C_{\rm s} \, \beta \, \sigma \, \frac{h_{\rm b}}{\delta z} \, \mathbf{u} \, ||\mathbf{u}||
+\end{equation}
+where the parameters are the same as in Eq.~(\ref{drag}) except for the additional depth of vegetation, $h_{\rm b}$, height of a grid cell, $\delta z$, and $\mathbf{u}$ is the gas velocity in the first grid cell.
+
+Thermal radiation is absorbed in depth according to a 1-D radiative transport solver. The absorption coefficient is given by:
+\begin{equation}
+   \kappa = C_{\rm s} \, \sigma \, \beta
+\end{equation}
+Thermal convection is not imposed at the interface between the gas phase and the vegetation layer, but rather is imposed via a source term in the 1-D heat conduction solver:
+\begin{equation}
+   \langle \dot{q}_{\rm c,b}''' \rangle = \sigma \, \beta \, \dot{q}_{\rm c}'' \quad ; \quad \dot{q}_{\rm c}'' = h \, (T_{\rm g} - T_{\rm s}) \quad \hbox{W/m}^2 \quad ; \quad  h = \frac{k}{L} \, {\rm Nu}
+\end{equation}
+where $\dot{q}_{\rm c}''$ the convective heat transferred to a small, cylindrical solid under the assumption that the subgrid-scale vegetation is cylindrical and the gas velocity and temperature are taken from the first gas phase grid cell adjacent to the boundary.
+
+
+\subsection{Level Set Model}
+
+For simulations of wildland fires spanning large areas that cannot be gridded finely enough to predict fire spread using a physics-based model, there is an empirical model built based on level sets~\cite{Bova:IJWF2015}. The methodology reproduces in an Eulerian framework the approach used in the Lagrangian-based fire front-tracking model FARSITE~\cite{Finney:FARSITE}. This approach makes use of the Rothermel-Albini~\cite{Rothermel:1972,Albini:1976} surface fire spread rate formulae and the assumption that a surface fire spreading from a point under certain wind, slope and vegetation conditions does so with an ellipse-shaped fire front with, for a given wind speed, a fixed length-to-breadth ratio~\cite{Richards:1990}.
+
+The level set spread model can be applied in various ways:
+\begin{enumerate}
+\item Only the level set simulation is performed. The wind is not affected by the terrain, and there is no fire.
+\item The wind field is established over the terrain, but it is ``frozen'' when the fire ignites.
+\item The wind field follows the terrain, but there is no actual fire in the simulation. It is just front-tracking.
+\item The wind and fire are fully-coupled. When the fire front arrives at a given surface cell, it burns for a finite duration and with a heat release per unit area provided as part of the fuel model.
+\end{enumerate}
+When fully coupled to the CFD model, the level set function acts as an igniter as it reaches a new surface cell. The cell burns for a pre-determined amount of time. For cases where the depth of the fireline is less than the size of a grid cell, the burning time is extended while the burning rate is decreased so as to maintain conservation of fuel mass.
+
+
 
 
 
