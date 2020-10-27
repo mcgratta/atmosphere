@@ -99,12 +99,12 @@ $^{2}$ \quad U.S. Forest Service, Seattle, Washington, USA}
 \section{Introduction}
 
 % Motivation.
-In the last decades, wild land and wild land-urban interface (WUI) fires have received substantial attention due to their destructive nature and extensive cost in lives and property~\cite{thomas_2017,mcdermott_2019,boghani_2019,richards_2020}. Over the years, modeling and simulation activities of such phenomena have been tailored to the needs of planners, scientists and first responders, and by the available computing capabilities.
+In the last decades, wildland and wildland-urban interface (WUI) fires have received substantial attention due to their destructive nature and extensive cost in lives and property~\cite{thomas_2017,mcdermott_2019,boghani_2019,richards_2020}. Over the years, modeling and simulation activities of such phenomena have been tailored to the needs of planners, scientists and first responders, and by the available computing capabilities.
 % Wildfire modeling in the literature.
 A large body of literature can be found on the subject. See for example reviews~\cite{Papadopoulos_2011,Bakhshaii_2019,mcdermott_2019} on classical and new models with associated software. Due to inherent complex nature of the problem, most models of wildfires have historically relied on simplified field-tested rules and correlations.
 
 Among these, the fire spread model by Rothermel~\cite{Rothermel:1972} assumes quasi-steady state ground fire conditions and takes as inputs fuel properties, wind, terrain slope and moisture that can be measured in situ.
-Fuel models have been cataloged~\cite{Anderson:1982}, and their input parameters defined in a manner the user can select and combine the most appropriate listed fuels for her case of study. Rothermels fire line model is a widely used wildfire spread model, and has been implemented in several simulation tools~\cite{Finney:FARSITE,Bova:IJWF2015,mcgratta_2013} \textbf{OTHERS?}, enabling a range of planning and operational forecasting capabilities.
+Fuel models have been cataloged~\cite{Anderson:1982}, and their input parameters defined in a manner the user can select and combine the most appropriate listed fuels for her case of study. Rothermel's fire line model is a widely used wildfire spread model, and has been implemented in several simulation tools~\cite{Finney:FARSITE,Bova:IJWF2015,mcgratta_2013,Coen:2,Coen:2015,CAWFE,ELMFIRE,WRF-Fire,Coen:2013,Mandel:2009,WRF-SFIRE,Mandel:2011,Mandel:2014,Kochanski:2016}, enabling a range of planning and operational forecasting capabilities.
 
 % Level set as a simplified fire spread model, operational forecasting.
 Evolution of wild land fires is usually tied to a fire front, which can have a complex shape moving/deforming with the local flame spread velocities. Knowing the location of this fire front and local properties of the fire, fuel and terrain allows, by use of simplified models like Rothermels, to predict local ignition and fire spread. When modeling the problem numerically, identifying such fire front at a given moment in time requires a mathematical representation and an associated discretization or mesh. The Lagrangian treatment of the motion of a fire front requires specifying a set of control markers and connectivity that define and move with such front. Therefore, the fire front is represented by this discrete mesh. For example, if the domain of motion is a surface terrain, this Lagrangian mesh can be a polygon that moves with the front along this surface~\cite{Finney:FARSITE,Bova:IJWF2015}.
@@ -379,6 +379,64 @@ Here, $u(\mathbf{x},t)$ is the computed velocity component, $u_0$ is the specifi
 
 \subsection{Simple example}  \label{sec:simexp}
 
+In July and August of 1986, the Commonwealth Scientific and Industrial Research Organisation (CSIRO) of Australia conducted controlled grassland fire experiments near Darwin, Northern Territory~\cite{Cheney:IJWF1993}. July and August are in the middle of the dry season when the grasses are fully cured (dried) and the weather is warm and dry. The experiments were conducted on flat plots measuring 100~m by 100~m, 200~m by 200~m, or 200~m by 300~m. Two cases have been simulated. Case~C064 was conducted on a 100~m by 100~m plot of kerosene grass ({\it Eriachne burkittii}); Case~F19 was conducted on a 200~m by 200~m plot of kangaroo grass ({\it Themeda australis}).
+
+Two of these experiments were originally simulated with FDS by Mell~et~al.~\cite{Mell:IJWF2007}. These simulations modeled the grass as a collection of cylindrical Lagrangian particles. Now these two experiments are also simulated using the Boundary Fuel Model (BFM)~\cite{Perez-Ramirez:FT2017} and the Rothermel-Albini fire spread algorithm~\cite{Rothermel:1972,Albini:1976}. For the experiment labelled Case~C064, fuel index 1 (Short Grass) is used, with a modified moisture fraction of 0.063. For F19, fuel index 3 (Tall Grass) is used, with a modified moisture fraction of 0.058.
+
+Measured properties for the specific types of grasses burned in the two experiments are listed in Table~\ref{Properties_Grasses}. Properties that were not measured are listed in Table~\ref{Assumed_Properties_Grasses}. These assumed properties are typically for wood or cellulosic fuels. The moisture is modeled as water. The grass is assumed to be composed primarily of cellulose.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{figures/Case_F19_0358.png}
+\caption[Snapshot of the simulation of CSIRO Grassland Fire F19]{Snapshot of the simulation of CSIRO Grassland Fire F19.}
+\label{F19}
+\end{figure}
+
+A snapshot of the Lagrangian particle simulation of Case~F19 is shown in Fig.~\ref{F19}. The computational domain in this case is 240~m by 240~m by 20~m. The grid cells are 0.5~m cubes. The domain is subdivided into 36 individual meshes and run in parallel. The grass is represented 1 simulated blade per grid cell. The radius of the cylinder is derived from the measured surface area to volume ratio. Each simulated blade of grass represents many more actual blades of grass. The weighting factor is determined from the measured bulk mass per unit area. The fires in the experiments were ignited by two men carrying drip torches walking in opposite directions along the upwind boundary of the plot (the red strip in Fig.~\ref{F19}). In FDS, this action was modeled using a specified spread rate along the strip.
+
+\begin{table}[ht]
+\begin{center}
+\caption[Measured properties for the CSIRO Grassland Fire cases]{Measured properties for the CSIRO Grassland Fire cases~\cite{Cheney:IJWF1993}.}
+\label{Properties_Grasses}
+\begin{tabular}{|l|c|c|c|}
+\hline
+Property                        & Units         & Case F19      & Case C064     \\ \hline \hline
+Wind Speed                      & m/s           & 4.8           & 4.6           \\ \hline
+Ambient Temperature             & $^\circ$C     & 34            & 32            \\ \hline
+Surface Area to Volume Ratio    & m$^{-1}$      & 12240         & 9770          \\ \hline
+Grass Height                    & m             & 0.51          & 0.21          \\ \hline
+Bulk Mass per Unit Area         & kg/m$^2$      & 0.313         & 0.283         \\ \hline
+Moisture Fraction               & \%            & 5.8           & 6.3           \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+\caption[Assumed properties for dry grass and soil]{Assumed properties for various types of dried grass and soil. Note that the Pyrolysis Temperature is taken to be the temperature at which the mass loss rate peaks in the TGA experiments of Morvan and Dupuy~\cite{Morvan:CF2004}.}
+\label{Assumed_Properties_Grasses}
+\begin{tabular}{|l|c|c|c|}
+\hline
+Property                        & Units                 & Value                     & Reference                             \\ \hline \hline
+Chemical Composition            & --                    & C$_6$H$_{10}$O$_5$        & Assumption                            \\ \hline
+Heat of Combustion              & kJ/kg                 & 15600                     & \cite{Susott:FS1982}                  \\ \hline
+Soot Yield                      & kg/kg                 & 0.015                     & \cite{SFPE:Tewarson}                  \\ \hline
+Char Yield                      & kg/kg                 & 0.2                       & \cite{Susott:FS1982}                  \\ \hline
+Specific Heat                   & kJ/(kg$\cdot$K)       & 1.5                       & Various sources                       \\ \hline
+Conductivity                    & W/(m$\cdot$K)         & 0.1                       & Assumption                            \\ \hline
+Density                         & kg/m$^3$              & 512                       & \cite{Rothermel:1972}                 \\ \hline
+Heat of Pyrolysis               & kJ/kg                 & 418                       & \cite{Morvan:CF2004}                  \\ \hline
+Pyrolyis Temperature            & $^\circ$C             & 200                       & \cite{Morvan:CF2004}                  \\ \hline \hline
+Obukhov Length                  & m                     & -500                      & Assumption                            \\ \hline
+Aerodynamic Roughness Length    & m                     & 0.03                      & Assumption                            \\ \hline
+Drag Coefficient                & --                    & 2.8                       & \cite{Falkenstein-Smith:2018}         \\ \hline \hline
+Soil Specific Heat              & kJ/(kg$\cdot$K)       & 2.0                       & \cite{Farouki:1981}                   \\ \hline
+Soil Conductivity               & W/(m$\cdot$K)         & 0.25                      & \cite{Farouki:1981}                   \\ \hline
+Soil Density                    & kg/m$^3$              & 1300                      & \cite{Farouki:1981}                   \\ \hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
 
 
 
@@ -399,7 +457,7 @@ Here, $u(\mathbf{x},t)$ is the computed velocity component, $u_0$ is the specifi
 
 
 \externalbibliography{yes}
-\bibliography{Vanella_Article_Atmosphere_2020}
+\bibliography{Vanella_Article_Atmosphere_2020,LOFM_Workshop_Refernces}
 
 
 % The following MDPI journals use author-date citation: Arts, Econometrics, Economies, Genealogy, Humanities, IJFS, JRFM, Laws, Religions, Risks, Social Sciences. For those journals, please follow the formatting guidelines on http://www.mdpi.com/authors/references
