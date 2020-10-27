@@ -103,11 +103,11 @@ In the last decades, wildland and wildland-urban interface (WUI) fires have rece
 % Wildfire modeling in the literature.
 A large body of literature can be found on the subject. See for example reviews~\cite{Papadopoulos_2011,Bakhshaii_2019,mcdermott_2019} on classical and new models with associated software. Due to inherent complex nature of the problem, most models of wildfires have historically relied on simplified field-tested rules and correlations.
 
-Among these, the fire spread model by Rothermel~\cite{Rothermel:1972} assumes quasi-steady state ground fire conditions and takes as inputs fuel properties, wind, terrain slope and moisture that can be measured in situ.
-Fuel models have been cataloged~\cite{Anderson:1982}, and their input parameters defined in a manner the user can select and combine the most appropriate listed fuels for her case of study. Rothermel's fire line model is a widely used wildfire spread model, and has been implemented in several simulation tools~\cite{Finney:FARSITE,Bova:IJWF2015,mcgratta_2013,Coen:2,Coen:2015,CAWFE,ELMFIRE,WRF-Fire,Coen:2013,Mandel:2009,WRF-SFIRE,Mandel:2011,Mandel:2014,Kochanski:2016}, enabling a range of planning and operational forecasting capabilities.
+Among these, the fire spread rate model by Rothermel~\cite{Rothermel:1972} assumes quasi-steady state surface fire conditions and takes as inputs fuel properties, wind, terrain slope and moisture that can be measured in situ.
+Fuel models have been cataloged~\cite{Anderson:1982}, and their input parameters defined in a manner the user can select and combine the most appropriate listed fuels for her case of study. Rothermel's head fire rate of spread formula is a widely used, and has been implemented in several simulation tools~\cite{Finney:FARSITE,Bova:IJWF2015,mcgratta_2013,Coen:2,Coen:2015,LAUTENBERGER_2013,Coen:2013,Mandel:2009,Mandel:2011,Mandel:2014,Kochanski:2016}, enabling a range of planning and operational forecasting capabilities.
 
 % Level set as a simplified fire spread model, operational forecasting.
-Evolution of wild land fires is usually tied to a fire front, which can have a complex shape moving/deforming with the local flame spread velocities. Knowing the location of this fire front and local properties of the fire, fuel and terrain allows, by use of simplified models like Rothermels, to predict local ignition and fire spread. When modeling the problem numerically, identifying such fire front at a given moment in time requires a mathematical representation and an associated discretization or mesh. The Lagrangian treatment of the motion of a fire front requires specifying a set of control markers and connectivity that define and move with such front. Therefore, the fire front is represented by this discrete mesh. For example, if the domain of motion is a surface terrain, this Lagrangian mesh can be a polygon that moves with the front along this surface~\cite{Finney:FARSITE,Bova:IJWF2015}.
+Evolution of wild land fires is usually tied to a fire front, which can have a complex shape moving/deforming with the local flame spread velocities. Knowing the location of this fire front and local properties of the fire, fuel and terrain allows, by use of simplified models like FARSITE~\cite{Finney:FARSITE}, to predict local ignition and fire spread. When modeling the problem numerically, identifying such fire front at a given moment in time requires a mathematical representation and an associated discretization or mesh. The Lagrangian treatment of the motion of a fire front requires specifying a set of control markers and connectivity that define and move with such front. Therefore, the fire front is represented by this discrete mesh. For example, if the domain of motion is a surface terrain, this Lagrangian mesh can be a polygon that moves with the front along this surface~\cite{Finney:FARSITE,Bova:IJWF2015}.
 On the other hand, an Eulerian representation of motion allows for the mesh to be fixed in space (i.e. in a terrain a polygonal patch mesh of said terrain). Then, the location of the fire front can be portrayed implicitly by using a scalar field defined in the fixed two dimensional mesh. This scalar field is called level set function and numerical methods that evolve it in time are called Level Set Methods (LSM)~\cite{Sethian:1999,Osher:2006}. Some wildfire solvers that use LSM to track the fire front are described in references~\cite{coen_2013,Bova:IJWF2015,mcgratta_2013,LAUTENBERGER_2013}. A practical comparison of the two techniques as implemented in WFDS~\cite{Mell:IJWF2007} and FARSITE~\cite{Finney:FARSITE} is provided in reference~\cite{Bova:IJWF2015}.
 
 % Resolving the flow features on terrains using LES over complex terrains. Describe what we do, FDS, cut-cell schemes, immersed boundary methods.
@@ -125,18 +125,18 @@ In the following section a description on the mathematical model for fire over t
 
 \section{Mathematical model} \label{sec:matmodel}
 
-For fire modeling on the gas phase, FDS employs a Low Mach approximation for thermally driven buoyant and stratified flows~\cite{Rehm:1}. Under this assumption the pressure field $p$ can be viewed as the summation of two components: a background pressure $\overline{p}(z,t)$ used on the equation of state (the ideal gas law is used), and a hydrodynamic pressure $\tilde{p}(x,y,z,t)$ resulting from fluid motion.
+For fire modeling on the gas phase, FDS employs a low Mach approximation for thermally driven buoyant and stratified flows~\cite{Rehm:1}. Under this assumption the pressure field $p$ can be viewed as the summation of two components: a background pressure $\bar{p}(z,t)$ used on the equation of state (the ideal gas law is used), and a hydrodynamic pressure $\tilde{p}(x,y,z,t)$ resulting from fluid motion.
 
-Consider a mixture composed of $N$ chemical species $\alpha$, moving on a fixed point $\mathbf{x}$ in space with a mass weighted average velocity $\mathbf{u}(\mathbf{x},t)$. If $\rho(\mathbf{x},t)$ is the mixture density, the mass fraction for species $\alpha$ is $Y_\alpha = \rho_\alpha / \rho$, were $\rho_\alpha(\mathbf{x},t)$ is the species density for the local thermodynamic conditions. The scalar transport and momentum equations take the form:
+Consider a mixture composed of $N$ chemical species $\alpha$, moving on a fixed point $\mathbf{x}$ in space with a mass weighted average velocity $\mathbf{u}(\mathbf{x},t)$. If $\rho(\mathbf{x},t)$ is the mixture density, the mass fraction for species $\alpha$ is $Y_\alpha = \rho_\alpha / \rho$, where $\rho_\alpha(\mathbf{x},t)$ is the species mass density and $\rho = \sum \rho_\alpha$. The scalar transport and momentum equations take the form:
 \begin{eqnarray}
-   \frac{\partial \rho Y_\alpha}{ \partial t} + \nabla \cdot ( \mathbf{J_{c}}_\alpha ) &=& - \nabla \cdot (\mathbf{J_{d}}_\alpha) + \dot{m}_\alpha'''  +
+   \frac{\partial \rho Y_\alpha}{ \partial t} + \nabla \cdot ( \rho Y_\alpha  \mathbf{u} ) &=& - \nabla \cdot \mathbf{J_{d}}_\alpha + \dot{m}_\alpha'''  +
     \dot{m}_{b,\alpha}'''\; , \; \alpha=1,\dots,N \label{eqn:spectran} \\
     \frac{\partial \mathbf{u}}{\partial t} - \mathbf{u} \times \boldsymbol{\omega} + \nabla H - \tilde{p} \, \nabla \left( 1/\rho\right) &=&
     \frac{1}{\rho} \left[ (\rho-\rho_0) \mathbf{g} + \mathbf{f}_{b} + \nabla \cdot \boldsymbol{\tau} \right] \label{eqn:momtran}
 \end{eqnarray}
-where $\mathbf{J_{c}}_\alpha=\rho Y_\alpha  \mathbf{u}$, $\mathbf{J_{d}}_\alpha=- \rho D_\alpha \boldsymbol{\nabla} Y_\alpha$ are the convective and diffusive fluxes for component $\alpha$. Ficks Law for binary diffusion respect to a background species is assumed, $D_\alpha$ is the diffusivity of $\alpha$ respect to the background species, $\dot{m}_\alpha'''(\mathbf{x},t)$ is the combustion volumetric source for species $\alpha$ and $ \dot{m}_{b,\alpha}'''$ is the contribution to species $\alpha$ from sub-grid particles gasification. Also, in the momentum equation the head $H=|\mathbf{u}|^2/2 + \tilde{p}/\rho$, and $\tilde{p}$ is the perturbation pressure, $\rho_0(z)$ is an equlibrium density, $\mathbf{g}=(0,0,g_z)$ gravity vector, $\mathbf{f}_{b}$ is the particle force term and $\boldsymbol{\tau}$ tensor accounting for molecular and sub-grid turbulent stresses parameterized by an eddy viscosity model. This last model is employed by default in large eddy simulation (LES) of outdoor fires. Details of the model equations and their derivation are found in reference~\cite{mcgratta_2013tr}.
+where $\mathbf{J_{d}}_\alpha=- \rho D_\alpha \boldsymbol{\nabla} Y_\alpha$ are the diffusive fluxes for component $\alpha$. Fick's Law for binary diffusion respect to a background species is assumed, $D_\alpha$ is the diffusivity of $\alpha$ respect to the background species.  To enforce realizability, $\sum_\alpha \mathbf{J_{d}}_\alpha = 0$, we lump errors in diffusive transport into the most abundant species locally \cite{McDermott:2015}. The volumetric combustion source term for species $\alpha$ is $\dot{m}_\alpha'''(\mathbf{x},t)$  and $\dot{m}_{b,\alpha}'''$ is the contribution to species $\alpha$ from subgrid particle gasification. In the momentum equation the head is $H=|\mathbf{u}|^2/2 + \tilde{p}/\rho$, $\tilde{p}$ is the perturbation pressure, and $\rho_0(z)$ is an equlibrium densit.  The gravity vector is $\mathbf{g}=(0,0,g_z)$, $\mathbf{f}_{b}$ is the particle force term, and $\boldsymbol{\tau}$ is a tensor accounting for molecular and subgrid turbulent stresses parameterized by an effective eddy viscosity model. This last model is employed by default in large-eddy simulation (LES) of outdoor fires. Details of the model equations and their derivation are found in \cite{mcgratta_2013tr}.
 
-Further, the flow field is subjected to the following divergence constraint:
+Conservation of energy is achieved by forcing flow field to obey the following thermodynamic divergence constraint:
 %
 \begin{eqnarray}
     ( \nabla \cdot \mathbf{u} )^{th} &=&
@@ -146,7 +146,7 @@ Further, the flow field is subjected to the following divergence constraint:
     &+& \frac{1}{\rho} \sum_\alpha \left( \frac{\overline{W}}{W_\alpha} - \frac{h_{s,\alpha}}{c_p T} \right) \left[ \dot{m}_\alpha'''  + \dot{m}_{b,\alpha}''' - \nabla \cdot (\mathbf{J_{d}}_\alpha) - \mathbf{u} \cdot \nabla (\rho Y_\alpha) \right] \label{eq:divth}
 \end{eqnarray}
 %
-where $h_s$ is the local sensible enthalpy, $\dot{q}''', \dot{q}_b'''$ are heat release rates due to combustion and particle gasification, $\dot{\mathbf{q}}''$ is the heat flux, sum of conduction, convection and radiation, and $T$ is the local temperature. The mixture specific heat at constant pressure and molecular weight are $c_p=\sum_{\alpha =1}^N{c_{p,\alpha} Y_\alpha}$ and $\overline{W}=\left(\sum_{\alpha =1}^N{Y_\alpha /W_\alpha} \right)^{-1}$ respectively, built from the individual species counterparts as defined. Finally, $w,\rho_0,g_z$ on the stratification term are respectively, the local vertical velocity, density for standard conditions (depends on vertical coordinate), and vertical gravity acceleration. This thermodynamic divergence is derived from and acts as a proxy for the sensible enthalpy evolution equation~\cite{mcdermo_2014}. Being $R$ the ideal gas constant, problem is closed with the ideal gas law $ \overline{p} = {\rho R T}/{\overline{W}}$.
+where $h_s$ is the local sensible enthalpy, $\dot{q}''', \dot{q}_b'''$ are heat release rates due to combustion and particle gasification, $\dot{\mathbf{q}}''$ is the heat flux, sum of conduction, convection and radiation, and $T$ is the local temperature. The mixture specific heat at constant pressure and molecular weight are $c_p=\sum_{\alpha =1}^N{c_{p,\alpha} Y_\alpha}$ and $\overline{W}=\left(\sum_{\alpha =1}^N{Y_\alpha /W_\alpha} \right)^{-1}$ respectively, built from the individual species counterparts as defined. Finally, $w,\rho_0,g_z$ on the stratification term are respectively, the local vertical velocity, density for standard conditions (depends on vertical coordinate), and vertical gravity acceleration. This thermodynamic divergence is derived from and acts as a proxy for the sensible enthalpy evolution equation~\cite{mcdermo_2014}. Equation (\ref{eq:divth}) is derived by factoring the divergence from the sensible enthalpy equation and applying the ideal gas law.  Given a background pressure and a local mass density the local temperature is computed from the ideal gas law as $T = \bar{p} \overline{W} / (\rho R) $.
 
 % Fire spread model equations.
 As commented in the introduction, the location of a fire front can be defined implicitly along the terrain surface through the zero of a two dimensional level set scalar function $\phi(x,y,t)$. This implicit form can be used to define and advection equation for the level set function:
@@ -406,6 +406,10 @@ Surface Area to Volume Ratio    & m$^{-1}$      & 12240         & 9770          
 Grass Height                    & m             & 0.51          & 0.21          \\ \hline
 Bulk Mass per Unit Area         & kg/m$^2$      & 0.313         & 0.283         \\ \hline
 Moisture Fraction               & \%            & 5.8           & 6.3           \\ \hline
+Measured ROS                   & m/s           & 1.0           & 1.0           \\ \hline
+Calculated ROS, Particle Method & m/s           & 1.0           & 1.0           \\ \hline
+Calculated ROS, Boundary Fuel Method & m/s           & 1.0           & 1.0           \\ \hline
+Calculated ROS, Level Set Method & m/s           & 1.0           & 1.0           \\ \hline
 \end{tabular}
 \end{center}
 \end{table}
@@ -440,7 +444,22 @@ Soil Density                    & kg/m$^3$              & 1300                  
 
 
 
-\subsection{Cogoleto Fire}  \label{sec:cogo}
+
+
+\subsection{Cogoleto Fire}  
+\label{sec:cogo}
+
+At approximately 23:00 (local time) on March 25, 2019, a wildfire started in the seaside town of Cogoleto, near Geno, Italy. Strong winds, gusting up to 100~km/h, spread the fire from its ignition point on a ridge above the town towards the sea. 
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{figures/cogoleto_fire_2019_ls4_1000.png}
+\caption{Satellite photograph of the region where the Cogoleto Fire occurred. The area outlined in red is the extent of the actual fire; green is the simulation.}
+\label{Cogoleto_satellite}
+\end{figure}
+
+Shown in Fig.~\ref{Cogoleto_satellite} are the results of a level set simulation of the fire superimposed on a satellite photograph of the area and the outline of the extent of the actual fire. The computational domain is assembled using the open-source GIS (Geographic Information System) program called QGIS~\cite{QGIS}. The wind speed and direction are based on a single weather station near the point of ignition. The vegetation type is provided by ??. In the simulation, the single point wind data is taken as the prevailing wind, and the local wind field is obtained via a CFD computation. The fire is simulated based on the position of the level set front; that is, when the front arrives at a given location, a fire is ignited and burns for a duration of time consistent with the specified fuel loading of that particular point on the map. 
+
+The extent of the simulated fire, shown in green in Fig.~\ref{Cogoleto_satellite}, is greater than the actual fire, shown in red. This is not surprising given that the simulation does not include fire suppression and the rate of spread of the level set front is determined empirically for vegetation that may not exactly resemble that of this particular region. 
 
 
 
@@ -457,7 +476,7 @@ Soil Density                    & kg/m$^3$              & 1300                  
 
 
 \externalbibliography{yes}
-\bibliography{Vanella_Article_Atmosphere_2020,LOFM_Workshop_Refernces}
+\bibliography{Vanella_Article_Atmosphere_2020,LOFM_Workshop_References}
 
 
 % The following MDPI journals use author-date citation: Arts, Econometrics, Economies, Genealogy, Humanities, IJFS, JRFM, Laws, Religions, Risks, Social Sciences. For those journals, please follow the formatting guidelines on http://www.mdpi.com/authors/references
