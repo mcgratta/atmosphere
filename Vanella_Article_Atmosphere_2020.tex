@@ -94,6 +94,9 @@ $^{4}$ \quad CIMA Research Foundation, Savona, Italy}
 
 \keyword{complex terrain; fire spread; immersed boundary method; level sets}
 
+\newcommand{\dV}{{\rm d}V}
+\newcommand{\dS}{{\rm d}S}
+
 
 \begin{document}
 
@@ -102,16 +105,16 @@ $^{4}$ \quad CIMA Research Foundation, Savona, Italy}
 
 In the past few decades, wildland and wildland-urban interface (WUI) fires have received substantial attention due to their destructive nature and extensive cost in lives and property~\cite{thomas_2017,mcdermott_2019,richards_2020}. A large body of literature can be found on the subject, as seen in various review articles~\cite{Papadopoulos_2011,Bakhshaii_2019,mcdermott_2019}. Due to the complex nature of fire, limited computing resources, and the needs of planners and first responders, most models of wildfires have historically relied on simplified field-tested rules and correlations. Among these, the rate of spread model of Rothermel~\cite{Rothermel:1972} assumes quasi-steady state surface fire conditions and takes as inputs fuel properties, wind, terrain slope, and moisture that can be measured {\em in situ}. Fuel models have been cataloged~\cite{Anderson:1982}, and their parameters defined so that model users can select and combine the most appropriate listed fuels. Rothermel's rate of spread formula is still widely used, and has been implemented in several simulation tools~\cite{Finney:FARSITE,Bova:IJWF2015,mcgratta_2013,Coen:2,Coen:2015,LAUTENBERGER_2013,Coen:2013,Mandel:2009,Mandel:2011,Mandel:2014,Kochanski:2016}, enabling a range of planning and operational forecasting capabilities.
 
-Wildland fire modeling typically focuses on tracking the fire front, which can have a complex shape that moves and deforms based on local conditions like fuel loading, moisture content, wind, and terrain. The fire front requires a mathematical representation. The Lagrangian approach is based on a polygonal mesh of control markers that represents the front~\cite{Finney:FARSITE,Bova:IJWF2015}. On the other hand, an Eulerian representation allows for a fixed two-dimensional mesh on which the fire front is defined implicitly by a scalar field. This scalar field is called the level set function and numerical methods that solve for it in time are called Level Set Methods (LSM)~\cite{Sethian:1999,Osher:2006}. Some wildfire solvers that use LSM to track the fire front are described in references~\cite{coen_2013,Bova:IJWF2015,mcgratta_2013,LAUTENBERGER_2013}. A practical comparison of the two techniques as implemented in the Fire Dynamics Simulator (FDS)~\cite{Mell:IJWF2007} and FARSITE~\cite{Finney:FARSITE} is provided in reference~\cite{Bova:IJWF2015}.
+Wildland fire modeling typically focuses on tracking the fire front, which can have a complex shape that moves and deforms based on local conditions like fuel loading, moisture content, wind, and terrain. The fire front requires a mathematical representation. The Lagrangian approach is based on a polygonal mesh of control markers that represents the front~\cite{Finney:FARSITE,Bova:IJWF2015}. On the other hand, an Eulerian representation allows for a fixed two-dimensional mesh on which the fire front is defined implicitly by a scalar field. This scalar field is called the level set function and numerical methods that compute the function are called Level Set Methods (LSM)~\cite{Sethian:1999,Osher:2006}. Some wildfire solvers that use LSM to track the fire front are described in references~\cite{coen_2013,Bova:IJWF2015,mcgratta_2013,LAUTENBERGER_2013}. A practical comparison of the two techniques as implemented in the Fire Dynamics Simulator (FDS)~\cite{Mell:IJWF2007} and FARSITE~\cite{Finney:FARSITE} is provided in reference~\cite{Bova:IJWF2015}.
 
-Because the spread rate of the fire front depends in part on the local wind conditions, a well resolved wind field over complex terrain should improve the accuracy of the overall model. The de facto physics-based technique for practical simulation of wind is Large Eddy Simulation (LES)~\cite{coen_2013,Mell:IJWF2007}. For fire simulation over complex terrain, a range of techniques are being developed, in particular, in the coupling of the fire and the wind. For fast simulation of outdoor fires, an immersed boundary method has been interfaced with a Level Set scheme~\cite{Bova:IJWF2015} and the Rothermel fire spread model. The wind speed input for Rothermel's model results from the local velocity over the terrain which is affected by fire buoyancy and flow evolution. These are in turn also influenced by wind atmospheric conditions, accounted for within simulations using a mean wind forcing concept. This is a first step at implementing a level set approach in a LES wind calculation with combustion. It is recognized that, in the empirically-based development of the Rothermel formula, the wind speed was not influenced by the local buoyancy induced flow.
+Because the spread rate of the fire front depends in part on the local wind conditions, a well resolved wind field over complex terrain should improve the accuracy of the overall model. The de facto physics-based technique for practical simulation of wind is Large Eddy Simulation (LES)~\cite{Linn:2007,coen_2013,Mell:IJWF2007}. For fire simulation over complex terrain, a range of techniques are being developed, in particular, in the coupling of the fire and the wind. For fast simulation of outdoor fires, an immersed boundary method has been interfaced with a Level Set scheme~\cite{Bova:IJWF2015} and the Rothermel fire spread model. The wind speed input for Rothermel's model results from the local velocity over the terrain which is affected by fire buoyancy and flow evolution. These are in turn also influenced by wind atmospheric conditions, accounted for within simulations using a mean wind forcing concept. This is a first step at implementing a level set approach in an LES wind calculation with combustion. It is recognized that in the empirically-based development of the Rothermel formula the wind speed is not influenced by the local buoyancy induced flow.
 
 In the following section the mathematical model for fire spread over complex terrain is described. The description of the terrain discretization is provided in section~\ref{sec:terraindisc}. The various fire spread methods are described in section~\ref{sec:firespread}, and the atmospheric boundary conditions in section~\ref{sec:wind}. Some flat terrain simulations are compared to experimental data, and a complex terrain simulation is compared to an actual wildfire in section~\ref{sec:numexp}. 
 
 
 \section{Mathematical Model} \label{sec:matmodel}
 
-For fire modeling on the gas phase, FDS employs a low Mach approximation for thermally driven buoyant and stratified flows~\cite{Rehm:1}. Under this assumption the pressure field $p$ can be viewed as the summation of two components: a background pressure $\bar{p}(z,t)$ used on the equation of state (the ideal gas law is used), and a hydrodynamic pressure $\tilde{p}(x,y,z,t)$ resulting from fluid motion.
+For fire modeling in the gas phase, FDS employs a low Mach approximation for thermally driven buoyant and stratified flows~\cite{Rehm:1}. Under this assumption the pressure field $p$ can be viewed as the summation of two components: a background pressure $\bar{p}(z,t)$ used in the equation of state (ideal gas law), and a hydrodynamic pressure $\tilde{p}(x,y,z,t)$ resulting from fluid motion.
 
 Consider a mixture composed of $N$ chemical species $\alpha$, moving on a fixed point $\mathbf{x}$ in space with a mass weighted average velocity $\mathbf{u}(\mathbf{x},t)$. If $\rho(\mathbf{x},t)$ is the mixture density, the mass fraction for species $\alpha$ is $Y_\alpha = \rho_\alpha / \rho$, where $\rho_\alpha(\mathbf{x},t)$ is the species mass density and $\rho = \sum \rho_\alpha$. The scalar transport and momentum equations take the form:
 \begin{eqnarray}
@@ -120,23 +123,22 @@ Consider a mixture composed of $N$ chemical species $\alpha$, moving on a fixed 
     \frac{\partial \mathbf{u}}{\partial t} - \mathbf{u} \times \boldsymbol{\omega} + \nabla H - \tilde{p} \, \nabla \left( 1/\rho\right) &=&
     \frac{1}{\rho} \left[ (\rho-\rho_0) \mathbf{g} + \mathbf{f}_{b} + \nabla \cdot \boldsymbol{\tau} \right] \label{eqn:momtran}
 \end{eqnarray}
-where $\mathbf{J_{d}}_\alpha=- \rho D_\alpha \boldsymbol{\nabla} Y_\alpha$ are the diffusive fluxes for component $\alpha$. Fick's Law for binary diffusion respect to a background species is assumed, $D_\alpha$ is the diffusivity of $\alpha$ respect to the background species.  To enforce realizability, $\sum_\alpha \mathbf{J_{d}}_\alpha = 0$, we lump errors in diffusive transport into the most abundant species locally \cite{McDermott:2015}. The volumetric combustion source term for species $\alpha$ is $\dot{m}_\alpha'''(\mathbf{x},t)$  and $\dot{m}_{b,\alpha}'''$ is the contribution to species $\alpha$ from subgrid particle gasification. In the momentum equation the head is $H=|\mathbf{u}|^2/2 + \tilde{p}/\rho$, $\tilde{p}$ is the perturbation pressure, and $\rho_0(z)$ is an equlibrium density.  The gravity vector is $\mathbf{g}=(0,0,g_z)$, $\mathbf{f}_{b}$ is the particle force term, and $\boldsymbol{\tau}$ is a tensor accounting for molecular and subgrid turbulent stresses parameterized by an effective eddy viscosity model. This last model is employed by default in large-eddy simulation (LES) of outdoor fires. Details of the model equations and their derivation are found in \cite{mcgratta_2013tr}.
+where $\mathbf{J_{d}}_\alpha=- \rho D_\alpha \boldsymbol{\nabla} Y_\alpha$ is the diffusive flux for component $\alpha$. Fick's Law for binary diffusion with respect to a background species is assumed, and $D_\alpha$ is the diffusivity of $\alpha$ with respect to the background species.  To enforce realizability, $\sum_\alpha \mathbf{J_{d}}_\alpha = 0$, errors in diffusive transport are lumped into the most abundant species locally~\cite{McDermott:2015}. The volumetric combustion source term for species $\alpha$ is $\dot{m}_\alpha'''(\mathbf{x},t)$  and $\dot{m}_{b,\alpha}'''$ is the contribution to species $\alpha$ from subgrid particle gasification. In the momentum equation the term $H=|\mathbf{u}|^2/2 + \tilde{p}/\rho$, $\tilde{p}$ is the perturbation pressure, and $\rho_0(z)$ is an ambient density of the atmosphere.  The gravity vector is $\mathbf{g}=(0,0,g_z)$, $\mathbf{f}_{b}$ is the particle force term, and $\boldsymbol{\tau}$ is a tensor accounting for molecular and subgrid turbulent stresses parameterized by an effective eddy viscosity model. This last model is employed by default in LES of outdoor fires. Details of the model equations and their derivation are found in Ref.~\cite{mcgratta_2013tr}.
 
-Conservation of energy is achieved by forcing flow field to obey the following thermodynamic divergence constraint:
+Conservation of energy is achieved by forcing the flow field to obey the following thermodynamic divergence constraint:
 \begin{eqnarray}
-    ( \nabla \cdot \mathbf{u} )^{th} &=&
+    ( \nabla \cdot \mathbf{u} )^{\rm th} &=&
     \left[ \frac{1}{\rho c_p T} - \frac{1}{\bar{p}} \right]
     \frac{\partial \bar{p}}{\partial t} + \frac{w \rho_0 g_z}{\rho c_p T} \nonumber \\
     &+& \frac{1}{\rho c_p T} \left[ \dot{q}''' + \dot{q}_b''' - \nabla \cdot \dot{\mathbf{q}}'' - \mathbf{u} \cdot \nabla (\rho h_s) \right] \nonumber \\
     &+& \frac{1}{\rho} \sum_\alpha \left( \frac{\overline{W}}{W_\alpha} - \frac{h_{s,\alpha}}{c_p T} \right) \left[ \dot{m}_\alpha'''  + \dot{m}_{b,\alpha}''' - \nabla \cdot (\mathbf{J_{d}}_\alpha) - \mathbf{u} \cdot \nabla (\rho Y_\alpha) \right] \label{eq:divth}
 \end{eqnarray}
-where $h_s$ is the local sensible enthalpy, $\dot{q}''', \dot{q}_b'''$ are heat release rates due to combustion and particle gasification, $\dot{\mathbf{q}}''$ is the heat flux, sum of conduction, convection and radiation, and $T$ is the local temperature. The mixture specific heat at constant pressure and molecular weight are $c_p=\sum_{\alpha =1}^N{c_{p,\alpha} Y_\alpha}$ and $\overline{W}=\left(\sum_{\alpha =1}^N{Y_\alpha /W_\alpha} \right)^{-1}$ respectively, built from the individual species counterparts as defined. Finally, $w,\rho_0,g_z$ on the stratification term are respectively, the local vertical velocity, density for standard conditions (depends on vertical coordinate), and vertical gravity acceleration. This thermodynamic divergence is derived from and acts as a proxy for the sensible enthalpy evolution equation~\cite{mcdermo_2014}. Equation (\ref{eq:divth}) is derived by factoring the divergence from the sensible enthalpy equation and applying the ideal gas law.  Given a background pressure and a local mass density the local temperature is computed from the ideal gas law as $T = \bar{p} \overline{W} / (\rho R) $.
+where $h_s$ is the local sensible enthalpy, $\dot{q}''', \dot{q}_b'''$ are heat release rates due to combustion and particle gasification, $\dot{\mathbf{q}}''$ is the heat flux vector (conduction, convection and radiation), and $T$ is the local gas temperature. The mixture specific heat at constant pressure and molecular weight are $c_p=\sum_{\alpha =1}^N{c_{p,\alpha} Y_\alpha}$ and $\overline{W}=\left(\sum_{\alpha =1}^N{Y_\alpha /W_\alpha} \right)^{-1}$ respectively. This thermodynamic divergence is derived from and acts as a proxy for the sensible enthalpy evolution equation~\cite{mcdermo_2014}. Equation~(\ref{eq:divth}) is derived by factoring the divergence from the sensible enthalpy equation and applying the ideal gas law.  Given a background pressure and a local mass density, the local temperature is computed from the ideal gas law as $T = \bar{p} \overline{W} / (\rho R) $.
 
 
 \section{Terrain description and discretization} \label{sec:terraindisc}
 
-In figure~\ref{Fig:figure_1}a, a terrain is represented by its surface triangulation within an FDS cartesian mesh. Some cartesian cells and faces belonging to this mesh are transversed by the terrain surface. The remainder polyhedra and polygons that lay on the gas side of this intersected cartesian entities are called cut-cells and cut-faces. They discretize the fluid domain in the region surrounding the solid terrain. A detail of this unstructured mesh is shown in figure~\ref{Fig:figure_1}b. The resulting cut-cells and cut-faces are of varied sizes and shapes, and situations where more than one cut-cell per cartesian cell are not uncommon. As described later, small cells pose a temporal stability constraint in explicit time integration schemes that needs to be addressed.
-It is noted that a two level of refinement grid hierarchy emerges. The coarse level is defined by the Cartesian entities, whereas the fine level is defined by the cut-cell or unstructured counterparts. Methods that solve discrete model equations on these grids are called cut-cell or embedded boundary methods~\cite{berger_2016}. Reliably defining the cut-cell mesh geometric properties and topology is a complex problem on itself, omitted here in order to keep the discussion succinct.
+In Fig.~\ref{Fig:figure_1}, the terrain is represented by its surface triangulation within an FDS Cartesian mesh. Some Cartesian cells and faces belonging to this mesh are transversed by the terrain surface. The remaining polyhedra and polygons that lie on the gas side of these intersected geometries are called cut-cells and cut-faces. They discretize the fluid domain in the region surrounding the solid surface. A detail of this unstructured mesh is shown in Fig.~\ref{Fig:figure_1}. The resulting cut-cells and cut-faces are of varied sizes and shapes, and situations where there are more than one cut-cell per Cartesian cell are common. As described later, small cells impose a temporal stability constraint on explicit time integration schemes. A two-level grid refinement hierarchy emerges. The coarse level is defined by the Cartesian entities, whereas the fine level is defined by the cut-cell or unstructured components. Methods that solve discrete model equations on these grids are called cut-cell or embedded boundary methods~\cite{berger_2016}. Reliably defining the cut-cell mesh geometric properties and topology is a complex problem in and of itself, but beyond the scope of this paper.
 \begin{figure}[ht]
    \centering
    \includegraphics[trim = 12mm 42mm 8mm 25mm, clip,width=1\linewidth]{./figures/SketchFig1.pdf}
@@ -149,24 +151,23 @@ It is noted that a two level of refinement grid hierarchy emerges. The coarse le
 
 \subsection{Scalar transport and energy discretization in unstructured region}
 
-The equations for chemical species transport are discretized using the finite volume method (FV)~\cite{eymard_2000,leveque_2002}. See figure~\ref{Fig:figure_2}a. Integrating equation~\eqref{eqn:spectran} over a cut-cell $ii$ with control volume $\Omega_{ii}$:
+The equations for chemical species transport are discretized using the finite volume method (FV)~\cite{eymard_2000,leveque_2002}, as outlined in the diagram of Fig.~\ref{Fig:figure_2}. Integrating Eq.~(\ref{eqn:spectran}) over a cut-cell $ii$ with control volume $\Omega_{ii}$:
 \begin{equation}
- \int_{\Omega_{ii}} {\frac{\partial \rho Y_\alpha}{\partial t}} d \Omega + \int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot  \left(  \rho Y_\alpha \mathbf{u} \right)
-      } d \Omega  = -\int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot \left(  \mathbf{J_{d}}_\alpha  \right)  } d \Omega + \int_{\Omega_{ii}} {( \dot{m}_\alpha'''+\dot{m}_{b,\alpha}''') } d \Omega \label{eq:intconvdiff}
+ \int_{\Omega_{ii}} {\frac{\partial \rho Y_\alpha}{\partial t}} \, \dV + \int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot  \left(  \rho Y_\alpha \mathbf{u} \right)
+      } \, \dV  = -\int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot \mathbf{J_{d}}_\alpha   } \, \dV + \int_{\Omega_{ii}} { \left( \dot{m}_\alpha'''+\dot{m}_{b,\alpha}''' \right) } \, \dV \label{eq:intconvdiff}
 \end{equation}
 For a control volume that does not change with time, the time derivative and source terms are approximated by
-\begin{eqnarray}
-  \int_{\Omega_{ii}} {\frac{\partial \rho Y_\alpha}{\partial t}} d \Omega & = & \frac{\partial}{\partial t} \int_{\Omega_{ii}} {\rho Y_\alpha} d \Omega
-  = \frac{\partial \widetilde{\rho \: Y_\alpha }_{ii}}{\partial t} V_{ii} \\
-  \int_{\Omega_{ii}} {( \dot{m}_\alpha''' +\dot{m}_{b,\alpha}''')} d \Omega & = & (\widetilde{ \dot{m}_\alpha''' }_{ii}+ \widetilde{\dot{m}_{b,\alpha}'''}_{ii}) V_{ii} \label{eq:intcons}
-\end{eqnarray}
-where $V_{ii}$ is the volume of cell $ii$ and tildes imply cell averages. In the following the notation is simplified by dropping tildes, observing that quantities are cell or face averaged. Consider the FV discretization of the diffusive term (eqn.~\eqref{eq:intconvdiff}) on cut-cell $ii$ of figure~\ref{Fig:figure_2}a:
 \begin{equation}
-\int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot \left(  \mathbf{J_{d}}_\alpha  \right)  } d \Omega =
-    \int_{\partial \Omega_{ii}} { \left( - \rho D_\alpha \boldsymbol{\nabla} Y_\alpha \right) \cdot \hat{\mathbf{n}}_{ii} } \: d \partial \Omega = \sum^{nf_c}_{k=1}
+  \int_{\Omega_{ii}} {\frac{\partial \rho Y_\alpha}{\partial t}} \, \dV \approx \frac{\partial \widetilde{\rho Y_\alpha }_{ii}}{\partial t} V_{ii} \quad ; \quad
+  \int_{\Omega_{ii}} { \left( \dot{m}_\alpha''' +\dot{m}_{b,\alpha}''' \right)} \, \dV \approx \left(\widetilde{ \dot{m}_\alpha''' }_{ii}+ \widetilde{\dot{m}_{b,\alpha}'''}_{ii} \right) V_{ii} \label{eq:intcons}
+\end{equation}
+where $V_{ii}$ is the volume of cell $ii$ and tildes imply cell averages. In the following the notation is simplified by dropping tildes, observing that quantities are cell or face averaged. Consider the FV discretization of the diffusive term of Eq.~(\ref{eq:intconvdiff}) on cut-cell $ii$ of Fig.~\ref{Fig:figure_2}:
+\begin{equation}
+\int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot   \mathbf{J_{d}}_\alpha   } \, \dV =
+    \int_{\partial \Omega_{ii}} { \left( - \rho D_\alpha \boldsymbol{\nabla} Y_\alpha \right) \cdot \hat{\mathbf{n}}_{ii} } \, \dS = \sum^{n_{\rm f}}_{k=1}
     \left( - \rho D_\alpha \boldsymbol{\nabla} Y_\alpha \right)_k \cdot \hat{\mathbf{n}}_{ii,k} \: A_k \label{eq:discfvdiffcc}
 \end{equation}
-The integral over the cut-cell volume has been transformed in an area integral on its $nf_c=5$ faces using the divergence theorem. As these $k$ faces with areas $A_k$ and normals out of the control volume $\hat{\mathbf{n}}_{ii,k}$ are planar by construction, the method for evaluation of their mean diffusive fluxes $\left( - \rho D_\alpha \boldsymbol{\nabla} Y_\alpha \right)_k$ will define the spatial accuracy of the discretization. A centroid to centroid (i.e. $\Delta x_{cc}$ in figure~\ref{Fig:figure_2}a) finite differences and linear interpolation are used to approximate $\boldsymbol{\nabla} Y_\alpha$ and $\rho D_\alpha$ for each face belonging to the gas phase. Also, a normal probe approach~\cite{balaras_2004} is employed to sample information from the fluid to define fluxes in boundary cut-faces.
+The integral over the cut-cell volume has been transformed in an area integral on its $n_{\rm f}=5$ faces using the divergence theorem. As these $k$ faces with areas $A_k$ and outward normals $\hat{\mathbf{n}}_{ii,k}$ are planar by construction, the method for evaluation of their mean diffusive fluxes $\left( - \rho D_\alpha \boldsymbol{\nabla} Y_\alpha \right)_k$ will define the spatial accuracy of the discretization. Centroid to centroid (i.e. $\Delta x_{\rm cc}$ in Fig.~\ref{Fig:figure_2}) finite differences and linear interpolation are used to approximate $\boldsymbol{\nabla} Y_\alpha$ and $\rho D_\alpha$ for each face belonging to the gas phase. Also, a normal probe approach~\cite{balaras_2004} is employed to sample information from the fluid to define fluxes in boundary cut-faces.
 \begin{figure}[ht]
    \centering
    \includegraphics[trim = 30mm 42mm 35mm 45mm, clip,width=1\linewidth]{./figures/SketchFig2.pdf}
@@ -177,55 +178,49 @@ The integral over the cut-cell volume has been transformed in an area integral o
 \end{figure}
 Similarly, the discretization of the advective term is:
 \begin{equation}
-    \int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot  \left(  \rho Y_\alpha \mathbf{u} \right)} d \Omega =
-     \int_{\partial \Omega_{ii}} { \left( \rho Y_\alpha \mathbf{u} \right) \cdot \hat{\mathbf{n}}_{ii} } \: d \partial \Omega =
-     \sum^{nf_c}_{k=1} \left( \rho Y_\alpha \mathbf{u} \right)_k \cdot \hat{\mathbf{n}}_{ii,k} \: A_k \label{eq:discfvadvcc}
+    \int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot  \left(  \rho Y_\alpha \mathbf{u} \right)} \, \dV =
+     \int_{\partial \Omega_{ii}} { \left( \rho Y_\alpha \mathbf{u} \right) \cdot \hat{\mathbf{n}}_{ii} } \, \dS \approx
+     \sum^{n_{\rm f}}_{k=1} \left( \rho Y_\alpha \mathbf{u} \right)_k \cdot \hat{\mathbf{n}}_{ii,k} \, A_k \label{eq:discfvadvcc}
 \end{equation}
-where the advective flux for face $k$ is $\left( \rho Y_\alpha \mathbf{u} \right)_k = \overline{[\rho Y_\alpha]}_k \mathbf{u}_k$, and the over bar in $\overline{[\rho Y_\alpha]}_k$ means it is a flux limited interpolation to the cut-face~\cite{mcgratta_2013}. In the cut-cell region we use Godunov interpolation for the advective term. As the time integration scheme in FDS is an explicit Runge-Kutta (RK2) method, all variables in the right hand side of equations~\eqref{eq:discfvdiffcc}-\eqref{eq:discfvadvcc} are assumed known. The FV counterpart of the thermodynamic divergence expression for cut-cell $ii$ is:
+where the advective flux for face $k$ is $\left( \rho Y_\alpha \mathbf{u} \right)_k = \overline{[\rho Y_\alpha]}_k \mathbf{u}_k$, and the over bar in $\overline{[\rho Y_\alpha]}_k$ means it is a flux-limited interpolation to the cut-face~\cite{mcgratta_2013}. In the cut-cell region we use Godunov interpolation for the advective term. As the time integration scheme in FDS is an explicit Runge-Kutta (RK2) method, all variables in the right hand side of Eqs.~\eqref{eq:discfvdiffcc}-\eqref{eq:discfvadvcc} are assumed known. The FV counterpart of the thermodynamic divergence expression for cut-cell $ii$ is:
 \begin{eqnarray}
-    ( \nabla \cdot \mathbf{u} )_{ii}^{th} \; V_{ii} &=&
+    ( \nabla \cdot \mathbf{u} )_{ii}^{\rm th} \; V_{ii} &=&
     \left[ \frac{1}{(\rho c_p T)_{ii}} - \frac{1}{\bar{p}_{ii}} \right]
     \frac{\partial \bar{p}_{ii}}{\partial t} \; V_{ii} +
     \frac{w_{ii} \: \rho_0 g_z}{(\rho c_p T)_{ii}} V_{ii} \nonumber \\
     &+& \frac{1}{(\rho c_p T)_{ii}} \left[ (\dot{q}'''+ \dot{q}_b''')_{ii} V_{ii} -
-    \sum_{k=1}^{nf_c} \dot{\mathbf{q}}''_{ii,k} \cdot \hat{\mathbf{n}}_{ii,k} \: A_k
+    \sum_{k=1}^{n_{\rm f}} \dot{\mathbf{q}}''_{ii,k} \cdot \hat{\mathbf{n}}_{ii,k} \: A_k
     - \overline{\mathbf{u} \cdot \nabla (\rho h_s)} V_{ii} \right]  \\
     &+& \frac{1}{\rho_{ii}} \sum_\alpha \left( \frac{\overline{W}}{W_\alpha} - \frac{h_{s,\alpha}}{c_p T} \right)_{ii} \left[ (\dot{m}_\alpha'''+\dot{m}_{b,\alpha}''')_{ii} V_{ii} -
-    \sum_{k=1}^{nf_c} \mathbf{J}_{\alpha,ii,k} \cdot \hat{\mathbf{n}}_{ii,k} \: A_k
+    \sum_{k=1}^{n_{\rm f}} \mathbf{J}_{\alpha,ii,k} \cdot \hat{\mathbf{n}}_{ii,k} \: A_k
     - \overline{\mathbf{u} \cdot \nabla (\rho Y_\alpha)} V_{ii} \right] \nonumber \label{eq:divth2}
 \end{eqnarray}
-where the over line terms refer to flux limited interpolation of corresponding scalars and terms defined with subscript $ii$ refer to cell defined quantities. All heat and mass fluxes and scalars are assumed known. Also, the vertical velocity $w_{ii}$ is interpolated to the cut-cell centroid. Details of the FDS time integration scheme can be found in references~\cite{mcgratta_2013,mcdermo_2014}. For each RK2 substep, the species transport equations are advanced in all FDS cartesian cells, and then the solution (explicit fluxes and scalar densities) recomputed on the unstructured cut-cell region. A similar procedure is done for the thermodynamic divergence.
+where the over line terms refer to flux limited interpolation of corresponding scalars, and terms defined with subscript $ii$ refer to cell defined quantities. All heat and mass fluxes and scalars are assumed known. Also, the vertical velocity $w_{ii}$ is interpolated to the cut-cell centroid. Details of the FDS time integration scheme can be found in references~\cite{mcgratta_2013,mcdermo_2014}. For each RK2 substep, the species transport equations are advanced in all FDS Cartesian cells, and then the solution (explicit fluxes and scalar densities) recomputed on the unstructured cut-cell region. A similar procedure is done for the thermodynamic divergence.
 % Small cell linking for explicit time integration.
-As an explicit time integrator is used, in general there will arise cut-cells whose small-size will penalize severely the time step. For these we link their unknown number to larger surrounding cells, which in turn defines mathematically an evolution equation for the union of both linked cells. Cell linking in the context of momentum equations can be found in reference~\cite{kirk_2003}.
-In FDS, the momentum equations and pressure Poisson equation are solved in the cartesian mesh. Therefore, an immersed boundary method is used to reconstruct velocities in the cut-cell region. A divergence integral equivalence argument is used to transfer the the divergence from cut-cells to under laying cartesian cells, and build the source of the Poisson equation for the pressure.
+As an explicit time integrator is used, in general there will arise cut-cells whose small-size will penalize severely the time step. These cut-cells are linked to larger surrounding cells. Cell linking in the context of momentum equations can be found in Ref.~\cite{kirk_2003}. In FDS, the momentum equations and pressure Poisson equation are solved on the Cartesian mesh. Therefore, an immersed boundary method is used to reconstruct velocities in the cut-cell region. A divergence integral equivalence argument is used to transfer the divergence from cut-cells to the underlying Cartesian cells in order to build the source term of the Poisson equation for the pressure.
 
 
 \subsection{Immersed boundary method on cut-cell region and wall modeling}
 
-Collecting advective, shear stress and force terms in $\mathbf{F}(\mathbf{u},\mathbf{x},t)$ within equation~\ref{eqn:momtran}, the model momentum transport problem can be casted as~\cite{mcgratta_2013}:
-%
+Collecting advective, shear stress and force terms in $\mathbf{F}(\mathbf{u},\mathbf{x},t)$ within Eq.~(\ref{eqn:momtran}), the model momentum transport problem can be written~\cite{mcgratta_2013}:
 \begin{eqnarray}
-  \frac{\partial \mathbf{u}(\mathbf{x},t)}{\partial t} &=& - \left[ \mathbf{F}(\mathbf{u},\mathbf{x},t) + \boldsymbol{\nabla} H(\mathbf{x},t) \right ]\label{eq:LowMachMom} \\
-         \nabla \cdot \mathbf{u} (\mathbf{x},t) & = & \left(\nabla \cdot \mathbf{u} \right)^{th} \label{eq:LowMachDiv}
+  \frac{\partial \mathbf{u}(\mathbf{x},t)}{\partial t} &=& - \mathbf{F}(\mathbf{u},\mathbf{x},t) - \boldsymbol{\nabla} H(\mathbf{x},t)  \label{eq:LowMachMom} \\
+         \nabla \cdot \mathbf{u} (\mathbf{x},t) & = & \left(\nabla \cdot \mathbf{u} \right)^{\rm th} \label{eq:LowMachDiv}
 \end{eqnarray}
-%
-where equation~\eqref{eq:LowMachMom} is the momentum equation, subject to a specified divergence field, provided by equation~\eqref{eq:divth}.
+where Eq.~\eqref{eq:LowMachMom} is the momentum equation, subject to a specified divergence field, provided by Eq.~\eqref{eq:divth}.
 Boundary conditions are prescribed for $\mathbf{u}(\mathbf{x},t)$ on boundaries, including the immersed terrain.
-%Classical fractional step methods for time integration of incompressible or low Mach flow are based on two operations: First, momentum transport to obtain intermediate velocities, and second, projection of velocities into a target divergence space.
-The previous equations are advanced in time using a fractional step method. As illustration, consider their Forward Euler (FE) update from $t_n$ to $t_{n+1}=t_n + \Delta t$. Given $ \mathbf{u}^n=\mathbf{u}(\mathbf{x},t_n)$, $\nabla \cdot \mathbf{u}^{n+1} = \left( \nabla \cdot \mathbf{u}^{n+1} \right)^{th}$ known
-%
+
+The previous equations are advanced in time using a fractional step method. As illustration, consider their Forward Euler (FE) update from $t_n$ to $t_{n+1}=t_n + \Delta t$. Given $ \mathbf{u}^n=\mathbf{u}(\mathbf{x},t_n)$, $\nabla \cdot \mathbf{u}^{n+1} = \left( \nabla \cdot \mathbf{u}^{n+1} \right)^{\rm th}$ known
 \begin{eqnarray}
-  \frac{\mathbf{u}^{n+1}-\mathbf{u}^{n}}{\Delta t} &=& - \left[ \mathbf{F}^n +  \boldsymbol{\nabla} H^n \right] \label{eq:LowMachMomEu}\\
-  \nabla \cdot \mathbf{u}^{n+1} &=& \left( \nabla \cdot \mathbf{u}^{n+1} \right)^{th} \label{eq:LowMachDivEu}
+  \frac{\mathbf{u}^{n+1}-\mathbf{u}^{n}}{\Delta t} &=& - \mathbf{F}^n -  \boldsymbol{\nabla} H^n \label{eq:LowMachMomEu}\\
+  \nabla \cdot \mathbf{u}^{n+1} &=& \left( \nabla \cdot \mathbf{u}^{n+1} \right)^{\rm th} \label{eq:LowMachDivEu}
 \end{eqnarray}
-%
-where $\mathbf{u}^{n+1}$ represents a numerical solution at time $t_{n+1}$. This discrete FE update corresponds to the first sub-step of the FDS explicit RK2 integrator. As the potential field $H(\mathbf{x},t)$ does not have a time evolution equation, it is assumed responsible of enforcing the divergence condition and used on the projection step. Taking the divergence of equation~\eqref{eq:LowMachMomEu} and considering  the constraint~\eqref{eq:LowMachDivEu}, the two steps of the method are
-%
+where $\mathbf{u}^{n+1}$ represents a numerical solution at time $t_{n+1}$. This discrete FE update corresponds to the first sub-step of the FDS explicit RK2 integrator. As the potential field $H(\mathbf{x},t)$ does not have a time evolution equation, it is assumed responsible for enforcing the divergence condition and used on the projection step. Taking the divergence of Eq.~\eqref{eq:LowMachMomEu} and considering  the constraint, Eq.~\eqref{eq:LowMachDivEu}, the two steps of the method are
 \begin{enumerate}
   \item Solve Poisson equation for $H^n$:
 
 \begin{equation}
-   \nabla \cdot \boldsymbol{\nabla} H^n = - \left[ \frac{\left( \nabla \cdot \mathbf{u}^{n+1} \right)^{th} - \nabla \cdot \mathbf{u}^{n}}{\Delta t} \right] - \nabla \cdot \mathbf{F}^n \label{it:FSPoisson}
+   \nabla \cdot \boldsymbol{\nabla} H^n = - \left[ \frac{\left( \nabla \cdot \mathbf{u}^{n+1} \right)^{\rm th} - \nabla \cdot \mathbf{u}^{n}}{\Delta t} \right] - \nabla \cdot \mathbf{F}^n \label{it:FSPoisson}
 \end{equation}
 
   \item Obtain final velocity for step:
@@ -234,21 +229,17 @@ where $\mathbf{u}^{n+1}$ represents a numerical solution at time $t_{n+1}$. This
      \mathbf{u}^{n+1} = \mathbf{u}^{n} - \Delta t \left[ \mathbf{F}^n +  \boldsymbol{\nabla} H^n \right] \label{it:FSProject}
    \end{equation}
 
-   %The term $\hat{\mathbf{u}}^{n+1}=\mathbf{u}^{n} - \Delta t \mathbf{F}^n$ is known as intermediate velocity, and is a non divergence matching approximation to $\mathbf{u}^{n+1}$ (i.e. $\nabla \cdot \hat{\mathbf{u}}^{n+1} \neq \left( \nabla \cdot \mathbf{u}^{n+1} \right)^{th}$).
 \end{enumerate}
-%
-A consequence of the projection scheme is that boundary conditions are required on the Poisson equation of step~\eqref{it:FSPoisson}. For explicit methods and stationary \textit{solid} boundaries, the corresponding boundary condition is \textit{homogeneous} Neumann for $H^n$ in $\partial \Omega,\partial \Omega_1,...,\partial \Omega_{nbods}$~\cite{perot_1993}.
+A consequence of the projection scheme is that boundary conditions are required on the Poisson equation, \eqref{it:FSPoisson}. For explicit methods and stationary \textit{solid} boundaries, the corresponding boundary condition is \textit{homogeneous} Neumann for $H^n$ in $\partial \Omega,\partial \Omega_1,...,\partial \Omega_{\rm nbods}$~\cite{perot_1993}.
 Next, an approximation to the no-slip boundary condition at the immersed terrain surface is needed. To this end, a direct forcing immersed boundary method (IBM) for the momentum equations~\cite{fadlun_2000} is employed. A force field is computed on the discrete momentum equations on grid faces crossed by the immersed surfaces to approximate the no-slip boundary condition on these. In LES, the surrounding velocity field is modeled using an equilibrium boundary layer solution.
 
-In figure~\ref{Fig:figure_2}b the velocity update in each of the gas phase cut-face centroids $d$ is done individualizing the point $B$ on the boundary and normal direction through these. Also, and external point $e_x$ through the normal $\mathbf{\hat{n}}$ is defined at a distance $\delta_{ex}$, of the order of the cartesian cells size. Known velocities and fluid parameters are interpolated from the surrounding fluid points $e_1,\dots,e_4$ to $e_x$.
-This information is used to estimate a target velocity at step $n+1$, $\mathbf{\hat{u}}_d^{n+1,k-1}$ at point $d$, assuming the log law equilibrium boundary layer solution~\cite{mcgratta_2013}. The target velocity $\hat{u}_d^{n+1,k-1}$ component on the cut-face centroid is flux matched to the under-laying cartesian face $E$ velocity component $\hat{u}_E^{n+1,k-1}$. Finally, an immersed boundary force
-%
+In Fig.~\ref{Fig:figure_2}, the velocity update in each of the gas phase cut-face centroids $d$ is done individualizing the point $B$ on the boundary and normal direction through these. Also, and external point $e_x$ through the normal $\mathbf{\hat{n}}$ is defined at a distance $\delta_{ex}$, of the order of the Cartesian cells size. Known velocities and fluid parameters are interpolated from the surrounding fluid points $e_1,\dots,e_4$ to $e_x$.
+This information is used to estimate a target velocity at step $n+1$, $\mathbf{\hat{u}}_d^{n+1,k-1}$ at point $d$, assuming the log law equilibrium boundary layer solution~\cite{mcgratta_2013}. The target velocity $\hat{u}_d^{n+1,k-1}$ component on the cut-face centroid is flux-matched to the underlying Cartesian face $E$ velocity component $\hat{u}_E^{n+1,k-1}$. Finally, an immersed boundary force
 \begin{equation}
 F_E^k=-\frac{\hat{u}_E^{n+1,k-1}-u_E^{n}}{\Delta t} - \frac{\partial H^{n,k-1}}{\partial x}
 \label{eq:FIBM}
 \end{equation}
-%
-can be computed and used in equation~\eqref{it:FSPoisson} to take into account the presence of the body. The index $k$ refers in this context to the subiteration that can be performed in the IB force~\eqref{eq:FIBM} and projection~\eqref{it:FSPoisson}-\eqref{it:FSProject} to match final velocities with the wall modeled targets. This velocity reconstruction procedure has been combined with the level set method for fire spread described in next section.
+can be computed and used in Eq.~\eqref{it:FSPoisson} to take into account the presence of the body. The index $k$ refers in this context to the sub-iteration that can be performed in the IB force, Eq.~\eqref{eq:FIBM}, and projection, Eqs.~\eqref{it:FSPoisson}-\eqref{it:FSProject}, to match final velocities with the wall modeled targets. This velocity reconstruction procedure has been combined with the level set method for fire spread described in next section.
 
 
 \section{Wildland Fire Spread} \label{sec:firespread}
@@ -270,16 +261,16 @@ Lagrangian particles can be used to represent different types of vegetation, lik
 \end{equation}
 where $\rho$ is the air density, $C_{\rm d}$ is the drag coefficient, $C_{\rm s}$ is the shape factor (ratio of projected area to surface area), $\beta$ is the packing ratio, $\sigma$ is the surface area to volume ratio, and $\mathbf{u}$ is the air velocity. The diameter is specified via the surface area to volume ratio, $\sigma=2/r$ for a cylinder. The packing ratio is the volume of solid needles divided by the volume they occupy, typically denoted $\beta$. It is calculated by dividing the dry mass of vegetation per unit volume, the so-called ``bulk density,'' by the density of the dry vegetation, $\rho_{\rm d}$.
 
-A coniferous tree (e.g. pine, spruce, fir) can be represented in FDS as a collection of Lagrangian particles forming a large cone. The trunk and heavier branches are typically neglected.
+A coniferous tree (e.g., pine, spruce, fir) can be represented in FDS as a collection of Lagrangian particles forming a large cone. The trunk and heavier branches are typically neglected.
 
 
 \subsection{Boundary Fuel Model}
 
-In many simulations of wildland fire, the ground vegetation layer is too shallow to be resolved explicitly, as is done when using Lagrangian particles to represent the vegetation. In such cases, the ground vegetation can be modeled as a porous boundary consisting of a layer of dry vegetation, moisture, and air, underneath of which is hard ground~\cite{Perez-Ramirez:FT2017}. The drag exerted by the vegetation is modeled using a special velocity boundary condition, and convective heat transfer is modeled via a source term in the one-dimensional heat conduction equation that is solved through the layer of vegetation and solid ground. Thermal radiation penetrates the vegetation layer via a 1-D radiative transport equation that is used for semi-transparent solids.
+In many simulations of wildland fire, the ground vegetation layer is too shallow to be resolved explicitly, as is done when using Lagrangian particles to represent the vegetation. In such cases, the ground vegetation can be modeled as a porous boundary consisting of a layer of dry vegetation, moisture, and air, underneath which is hard ground~\cite{Perez-Ramirez:FT2017}. The drag exerted by the vegetation is modeled using a special velocity boundary condition, and convective heat transfer is modeled via a source term in the one-dimensional heat conduction equation that is solved through the layer of vegetation and solid ground. Thermal radiation penetrates the vegetation layer via a 1-D radiative transport equation that is used for semi-transparent solids.
 
 The Boundary Fuel and Particle Models share the same basic input parameters and pyrolyis model. The drag exerted on the wind flowing through the vegetation is imposed as a force term in the gas phase grid cell adjacent to the boundary:
 \begin{equation}
-    \mathbf{f}_{\rm b} = \frac{\rho}{2} \, C_{\rm d} \, C_{\rm s} \, \beta \, \sigma \, \frac{h_{\rm b}}{\delta z} \, \mathbf{u} \, ||\mathbf{u}||
+    \mathbf{f}_{\rm b} = \frac{\rho}{2} \, C_{\rm d} \, C_{\rm s} \, \beta \, \sigma \, \frac{h_{\rm b}}{\delta z} \, \mathbf{u} \, \|\mathbf{u}\|
 \end{equation}
 where the parameters are the same as in Eq.~(\ref{drag}) except for the additional depth of vegetation, $h_{\rm b}$, height of a grid cell, $\delta z$, and $\mathbf{u}$ is the gas velocity in the first grid cell.
 
@@ -296,7 +287,7 @@ where $\dot{q}_{\rm c}''$ the convective heat transferred to a small, cylindrica
 
 \subsection{Level Set Model}
 
-For simulations of wildland fires spanning large areas that cannot be gridded finely enough to predict fire spread using a physics-based model, fire spread via level sets is an option~\cite{Bova:IJWF2015}. This approach makes use of the Rothermel-Albini~\cite{Rothermel:1972,Albini:1976} surface fire spread rate formulae and the assumption that a surface fire spreading from a point under certain wind, slope and vegetation conditions does so with an ellipse-shaped fire front with, for a given wind speed, a fixed length-to-breadth ratio~\cite{Richards:1990}. The location of a fire front is defined implicitly via a two dimensional level set scalar function $\phi(x,y,t)=0$. The advection equation for the level set function is
+For simulations of wildland fires spanning large areas that cannot be gridded finely enough to predict fire spread using a physics-based model, fire spread via level sets is an option~\cite{Bova:IJWF2015}. This approach makes use of the Rothermel-Albini~\cite{Rothermel:1972,Albini:1976} surface fire spread rate formulae and the assumption that a surface fire spreading from a point under certain wind, slope and vegetation conditions does so with an ellipse-shaped fire front with, for a given wind speed, a fixed length-to-breadth ratio~\cite{Richards:1990}. The location of a fire front at time $t$ is defined by the set of points $x,y$ where the level set scalar function $\phi(x,y,t)=0$. The advection equation for the level set function is
 \begin{equation}
    \frac{D \phi(x,y,t)}{D t} =  \frac{\partial \phi}{\partial t} + \mathbf{R}_{uv} \cdot \nabla (\phi) = 0 \label{eqn:lset}
 \end{equation}
@@ -306,9 +297,9 @@ where $\mathbf{R}_{uv}=(R_u,R_v)$ is the spread rate vector. The magnitude of th
 \end{equation}
 where $R_0$ is the zero velocity, zero slope rate of spread that depends on the fuel properties. The vectors $\boldsymbol{\phi}_W,\boldsymbol{\phi}_S \ge 0$ are computed using the local wind and slope through empirical rules~\cite{Wilson:1980}. See Appendix 1 of reference~\cite{Bova:IJWF2015} for details on these calculations. In FDS, the level set spread model can be applied in various ways:
 \begin{enumerate}
-\item Only the level set simulation is performed. The wind is not affected by the terrain, and there is no fire.
+\item Only the level set simulation is performed, with a constant and uniform specified wind and slope. The wind is not affected by the terrain, and there is no fire.
 \item The wind field is established over the terrain, but it is ``frozen'' when the fire ignites.
-\item The wind field follows the terrain, but there is no actual fire in the simulation. It is just front-tracking.
+\item The wind field follows the terrain, but there is no actual fire in the simulation, just front-tracking.  The level set evolves continuously in time with the flow field.
 \item The wind and fire are fully-coupled. When the fire front arrives at a given surface cell, it burns for a finite duration and with a heat release per unit area provided as part of the fuel model.
 \end{enumerate}
 When fully coupled to the CFD model, the level set function acts as an igniter as it reaches a new surface cell. The cell burns for a pre-determined amount of time. For cases where the depth of the fireline is less than the size of a grid cell, the burning time is extended while the burning rate is decreased so as to maintain conservation of fuel mass.
@@ -317,7 +308,7 @@ When fully coupled to the CFD model, the level set function acts as an igniter a
 
 \section{Defining atmospheric wind : The Mean Forcing Concept} \label{sec:wind}
 
-The process of steering the solution of the mass, momentum, and energy equations to match wind speed and direction gathered at random weather stations is known as \emph{data assimilation}~\cite{Kalnay:2003}. FDS uses a relatively simple data assimilation technique, a method known as \emph{nudging}, where you add a forcing term to the momentum equation to ``nudge'' the flow in the direction of the specified wind. FDS automatically drives the mean velocity components toward the desired values by adding a forcing term to the momentum equation. For example, the $u$ component equation is modified as follows:
+The process of steering the solution of the mass, momentum, and energy equations to match wind speed and direction gathered at random weather stations is known as \emph{data assimilation}~\cite{Kalnay:2003}. FDS uses a relatively simple data assimilation technique, a method known as \emph{nudging}, where a forcing term is added to the momentum equation to ``nudge'' the flow in the direction of the specified wind. FDS automatically drives the mean velocity components toward the desired values by adding a forcing term to the momentum equation. For example, the $u$ component equation is modified as follows:
 \begin{equation}
    \frac{\partial u}{\partial t} + \ldots = \frac{u_0(z,t)-\overline{u}(z,t)}{\tau} \label{mean_forcing_u}
 \end{equation}
