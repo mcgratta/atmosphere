@@ -1,0 +1,124 @@
+\documentclass[12pt]{article}
+
+\setlength{\textwidth}{6.25in}
+\setlength{\textheight}{8.75in}
+\setlength{\topmargin}{0.in}
+\setlength{\headheight}{0.in}
+\setlength{\headsep}{0.in}
+\setlength{\parindent}{0.in}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\parskip}{\baselineskip}
+\setlength{\leftmargini}{\parindent} % Controls the indenting of the "bullets" in a list
+
+\usepackage{xcolor}
+\newcommand\hl[1]{\textcolor{red}{#1}}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+{\bf Response to comments by Reviewer 1}
+\end{center}
+
+The article "Application of a Cut-Cell Immersed Boundary Method for Wildfire Simulation over
+Complex Terrain" is clearly written and well structured. It shows noticeable effort to describe an
+original immersed boundary method, which is the core of its purpose. However, it is difficult to
+assess the relevance of this work, for three main reasons.
+
+\hl{Our original intent was to present a broad overview of the our approach to modeling wildland fire. The technical details of the model, verification and validation, and a user's guide is part of the package that one downloads when using the model, and these documents are available at the model web site. Nevertheless, we have added more details to the paper to better describe our approach.}
+
+1. A lack of model description
+
+The IBM together with the main solved PDE are correctly presented and a large amount of
+previous articles globally allows understanding the demarch. But many submodels and
+parametrization choices, that may have a strong influence on the final result, are weakly
+depicted. In particular:
+
+The volume combustion source term is not described.
+
+\hl{A new section (Sec.~2.2 ``Subgrid Parameterizations'') discusses subgrid parameterizations and combustion details.}
+
+Radiative modelling in the thermal divergence equation is not given. In particular, indications
+should be given on the gas and soot absorption coefficients, if required, or on a radiative fraction
+
+\hl{Further details on the radiation model have been added.}
+
+The pyrolysis model used for the lagrangian particles or the porous boundary is not given. In
+particular, the pyrolysis model shape (volume model ? surface model ?) is not depicted, and
+neither the chemical degradation path for the pyrolysing vegetation, nor the mass and heat
+transfer models in the porous boundary or the solid particles, are explained, whereas all these
+aspects may have a strong influence on the mass of fuel released in the atmosphere, and therefore
+on the fire spread rate.
+
+\hl{Details of the pyrolysis model have been added.}
+
+The heat exchange modelling between the gas phase and the solid particles is not depicted.
+
+\hl{Details have been added.}
+
+Same problem for many semi-empirical coefficients used for fluid/solid interface models: the
+drag coefficient and the shape factor in the drag force model (they probably differ between the
+particle model and the boundary flux model since they do not consider the same solid objects),
+the Nusselt correlation for the heat exchange coefficient.
+
+\hl{We added more details about how the convective and radiative heat transfer is done for the particle and boundary fuel models.}
+
+
+2. The influence of the numerical model parameters
+
+A sensitivity analysis on (at least) the following parameters would be helpful to assess the
+relevance of the numerical model:
+
+grid cell size
+
+\hl{The flat terrain fire spread (CSIRO) cases were all run at three different grid resolutions and showed no significant difference in spread rate. }
+
+pyrolysis model parameters, more precisely those which are made under an a priori assumption
+(conductivity, specific heat)
+
+\hl{We added a reference to a paper that McGrattan wrote in 2017 for the U.S. Combustion Institute meeting on sensitivity of parameters in the particle-based CSIRO calculations}
+
+Obukhov length and roughness length
+
+In particular, a comparison with the parameters used in a previous study [22] would be
+interesting, insofar as the model seems to be very close, except on the management on the
+boundary condition.
+
+\hl{Physical parameters describing the vegetation in the Australian grass land experiments are the same in the current study and the past study. However, many aspects of the modeling approach have changed or advanced, making it difficult to make useful comparisons regarding the influence of some model parameters or methods. These include the modeling approach for the ambient wind. This is discussed in the text.}
+
+
+3. A lack of quantitative comparisons
+
+In section 6.1, the only quantitative comparison is made on the average fire rate of spread. But,
+similarly with Ref [22], many comparisons could be made:
+
+Mass loss rate/heat release rate time histories
+
+fire front positions
+
+velocity in the low atmospheric layer
+
+\hl{We added more details about the flat terrain fire spread simulations, in particular a two-dimensional comparison of the fire front versus aerial observations.}
+
+All these comparisons between the two first approaches and the previous work could bring
+important information to explain the observed discrepancies: in particular, if these differences
+are explained by interface heat transfer issues, or pyrolysis model issues.
+
+\hl{We understand the reviewer's point. The differences between the current model and the version of the model in Mell et al.(2007) could, potentially, shed light on physical processes that need model advancements, such as heat transfer or thermal degradation. However, there are numerous differences between the 2007 and the current version of the model and these prohibitively confound such a comparison.}
+
+Finally, section 6.2 is of poor interest, because no reason for the differences between the actual
+fire and the simulation is raised, and no comparison with other numerical tools is given.
+
+\hl{Kevin}
+
+To conclude with, this paper needs strong improvements in the model description, the
+consideration of the effects of uncertainties related to model parametrization on the numerical
+results, and in the quantitative description of the results and the differences between the
+numerical model. In particular, it should include a precise comparison with simulations of ref.
+[22], since the observed differences cannot be related, at this stage, to the implementation of the
+IBM or to differences in the model description or parametrization. In this respect, the interest of
+the IBM approach, which is the main originality of this paper, is not shown.
+
+\end{document}

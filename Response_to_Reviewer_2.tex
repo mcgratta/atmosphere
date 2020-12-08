@@ -1,0 +1,58 @@
+\documentclass[12pt]{article}
+
+\setlength{\textwidth}{6.25in}
+\setlength{\textheight}{8.75in}
+\setlength{\topmargin}{0.in}
+\setlength{\headheight}{0.in}
+\setlength{\headsep}{0.in}
+\setlength{\parindent}{0.in}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\parskip}{\baselineskip}
+\setlength{\leftmargini}{\parindent} % Controls the indenting of the "bullets" in a list
+
+\usepackage{xcolor}
+\newcommand\hl[1]{\textcolor{red}{#1}}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+{\bf Response to comments by Reviewer 2}
+\end{center}
+
+Early attempts at a mechanistic modeled wildfire spread was in the late 1960s. After these few
+years of active development and advancement a lagged occurred for 15 to 20 years. The early.
+development was generally due to two engineers Rothermel and Albini. The delay was caused
+by the fact that a mechanistic approach is not in the training background for most Foresters. In
+the 1980s with the major advances in numerical techniques applied to combustion and fluid
+dynamics the gap with the Forester’s got even larger. However, in the last few decades
+engineers and fluid dynamicists have stepped in and made important progress. We are now at a
+stage where mechanistic models are becoming common and designed for different needs of
+wildfire managers.
+
+This paper is one of these developments. It uses large eddy simulations in the Fire Dynamic
+Simulator using three ways of describing the fuel and fire spread: fuel as a range of Lagrangian
+particles, fuel as a porous media and the traditional (empirical) fire boundary from which the
+fire spreads, the so-called level set approach. The arguments in the paper is well-developed
+using a novel boundary technique—cut- cell immersed method. Considering the sophistication
+of the rest of the model the assimilation technique used seems to be very simplistic and I
+assume temporary. Wind is such an important process in wildfires one assumes that this will be
+better developed. Overall, I found the model section difficult but very exciting.
+
+\hl{Since the time of the initial manuscript submission a significant improvement has been made in the way we treat wind boundary conditions.  As the reviewer noted, the previous approach was a rudimentary form of data assimilation where nudging was was used for momentum throughout the computational domain.  On closer inspection of wind validation cases we discovered two significant issues with this approach: First, the forcing terms did not work well together with the ``open'' boundary conditions we were using at the time for inflow and outflow convective boundaries---unstable inflow waves would persist if any flow reversals due to turbulence were encountered.  Second, the forcing terms in the momentum equation were clearly suppressing turbulence on the leeward side of hills. \\ \\
+To overcome these issues we have developed an improved ``open'' boundary condition, which is described in the revised manuscript (Sec.~5 on ``Atmospheric Wind Boundary Conditions'').  This new boundary condition solves both of the problems mentioned above, it is easier to implement, and it still allows for one-way downscaling of microscale meteorological model output or weather observations.  However, as the reviewer alludes, a more advanced modeling approach would allow for the possibility of a two-way coupling with the at least the microscale (1 km), but also the mesoscale (10 km) meteorologic models.  This is presently beyond our scope, but something we are considering for future work.}
+
+The numerical experiments are important to show how the model works with real properties.
+However, they seem to be an add-on and not very well developed and discussed. Something
+needs to be done with this section to make it as important part of the rest of the paper.
+
+\hl{More detail has been added to the numerical examples.}
+
+The idea of putting the scale differences together in the model boundary seems to be a very
+useful advance.
+
+\hl{The new ``open'' boundary conditions are capable of utilizing a synthetic eddy method to superimpose turbulence length scales on the background mean flow profiles.  A small example case is provided as a proof of concept.  We plan to explore the affect of inflow turbulence in more depth as future work.}
+
+\end{document}

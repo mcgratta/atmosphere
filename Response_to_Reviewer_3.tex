@@ -1,0 +1,98 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+
+\setlength{\textwidth}{6.25in}
+\setlength{\textheight}{8.75in}
+\setlength{\topmargin}{0.in}
+\setlength{\headheight}{0.in}
+\setlength{\headsep}{0.in}
+\setlength{\parindent}{0.in}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\parskip}{\baselineskip}
+\setlength{\leftmargini}{\parindent} % Controls the indenting of the "bullets" in a list
+
+\usepackage{xcolor}
+\newcommand\hl[1]{\textcolor{red}{#1}}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+{\bf Response to comments by Reviewer 3}
+\end{center}
+
+The study "Application of a Cut-Cell Immersed Boundary Method for Wildfire Simulation over Complex Terrain" describe a method to consider the forcing induced by a complex topography in wildfire propagation within the framework of "physical models", combining different approach. 
+
+The work is undoubtedly well structured and seems the fruit of great number of years of serious work, so substantially I have nothing to point out. But from a formal point of view, in my opinion, it shows some aspect that should be improved. Here I suggest some observation to work upon. 
+
+1)	INTRODUCTION
+
+Should be outlined where ``the state of the art'' and the bibliography analysis end, and where it starts the new work.
+
+Given that some aims of this study are "fast simulation and outdoor fires" I would recommend to cite
+the ``mass-consistent'' approach, ( for example the article Wagenbrenner, NS, Forthofer, JM, Lamb, BK, Shannon, KS, Butler, BW, (2016) Downscaling surface wind predictions from numerical weather prediction models in complex terrain with WindNinja. Atmos. Chem. Phys. 16:5229-5241, doi:10.5194/acp-16-5229-2016) and an "mass-consistent" application to a Rothermel/level set approach (Arca Bachisio, Ghisu Tiziano, Casula Marcello, Salis Michele, Duce Pierpaolo (2019) A web-based wildfire simulator for operational
+applications. International Journal of Wildland Fire 28, 99-112. https://doi.org/10.1071/WF18078)
+
+\hl{An additional paragraph has been added to the introduction that provides a reference to the review of models given in Arca et al. (2019) and provides some context on how the FDS suite of models differs from other approaches.}
+
+2) MATHEMATICAL MODEL
+
+The description of the mathematical model is too short. It is not possible to be clear in 30 lines for such a complex model. There is the risk of making a collection of citations and references to another series of works, while there should be an understandable basic outline.
+
+Please provide at least a simple description of the phenomena that is going to be modelled, together with the model hypothesis that allow for the simplification of the general physical frame. For example, at least the kind of fuels and the transformation process involved in combustion should be briefly described. It would be important also to provide a short description of the single term of each equation and its derivation. For example, to understand the model and to have a ready legibility it is important to specify as (p-po)*g*l/p is the buoyancy term. 
+
+\hl{Defined explicitly the buoyancy term.}
+
+
+The statement ``derived by factoring the divergence from the sensible enthalpy equation and applying the ideal gas law'' is difficult to understand. Therefore a few words should be dedicated.
+
+\hl{We include Equation (3) is derived by factoring the divergence85from the sensible enthalpy equation and applying the ideal gas law.}
+
+63: ``realizability'' is an important topic that should be described a little. 
+
+\hl{We added after equations(1)-(2) : Mass fractions $Y_\alpha$, solution of equations (1), must obey realizability constraints $0<Y_\alpha<1$ and $\sum_\alpha Y_\alpha=1$. In equations (1) starting from a realizable solution, realizability implies $\sum_\alpha \mathbf{J_{d}}_\alpha = 0$.}
+
+
+64: Please describe the phenomena ``volumetric combustion'' and ``subgrid particle gassification'' 
+
+\hl{We added : The volumetric combustion source term for species $\alpha$ is $\dot{m}_\alpha'''(\mathbf{x},t)$  and $\dot{m}_{b,\alpha}'''$ is the contribution to species $\alpha$ from subgrid particle gasification. These correspond to the amount of mass per unit volume and time of species $\alpha$ being added or substracted in a given point $\mathbf{x}$ due to chemical reaction or gasification of solid particles (or droplets), respectively.}
+
+66: ``an ambient density'' is too vague. Please specify. 
+\hl{We added : $\rho_0(z)$ is the modeled height dependent background density of the atmosphere.}
+
+67: Please supply a few words about the physical phenomena ``fb is the particle force term.''  
+
+\hl{We changed the statement to : $\mathbf{f}_{b}$ is the term contributed by modeled particle drag forces.}
+
+Eq. (3): $w$ is not defined. Please supply the definition. 
+
+\hl{We added : Also, $\boldsymbol{\omega}$ refers to the vorticity field.}
+
+
+76: What is the meaning of ``thermodynamic divergence'' in the superscript of the RHS of the energy conservation equation? Is the thermodynamic divergence different from a normal divergence? 
+
+\hl{A velocity divergence, $\nabla\cdot\mathbf{u}$, can be factored out of every transport equation.  Of course, in order for the fomulation to be consistent, each divergence must be the same.  In a typical low-speed flow algorithm for solving the Navier-Stokes equations, a target divergence is prescribed from thermodyanmics.  Often, for simplicity, the flow is considered ``divergence free'' if constant density is a reasonable approximation.  In that case, the target ``thermodynamic divergence'' is implied to be zero. The algorithm then uses a \emph{projection scheme} to enforce this constraint (this is the purpose of solving the Poisson equation for the pressure). With variable density combustion codes, the divergence is more complicated.  The target thermodynamic divergence is computed from the sensible enthalpy equation, utilizing mass conservation and the ideal gas equation of state. Again, the projection scheme enforces this constraint.  After projection, all the transport equations share the same divergence, as must be true for consistency.  Further, the sensible enthalpy equation has been satisfied, which accounts for the important effects of heat transfer and dilatation from the combustion.}
+
+3) TERRAIN DESCRIPTION AN DISCRETIZATION
+
+Other important concept are only cited but not described at all, please some word should be spend to describe :
+
+2 lines before eq. (7) ``a normal probe approach''
+
+\hl{We added : Also, a normal probe approach is employed to sample information from the fluid to define fluxes in boundary cut-faces. In a normal probe method, an external point is defined at a normal distance from the body of the order of the Cartesian grid size. Then, information from the fluid at this external point is obtained via interpolation. }
+
+line 96: ``flux-limited interpolation'' 
+line 96: ``Godunov interpolation'' 
+
+\hl{We reorganized the paragraph : In the cut-cell region a Godunov flux limited interpolation for the advective term is used. Flux limited interpolation is one of the fundamental components of stable numerical schemes for hyperbolic systems, of which mass transport inherits its mathematical properties.}
+
+line 97: ``Runge-Kutta method'' 
+
+\hl{We added : Explicit Runge-Kutta time integration methods are single-step multistage schemes widely used for advancing ordinary and partial differential equations [Leveque2007].}
+
+\hl{Marcos,Randy}
+
+\end{document}
