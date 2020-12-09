@@ -62,6 +62,7 @@
 % Add packages and commands here. The following packages are loaded in our class file: fontenc, inputenc, calc, indentfirst, fancyhdr, graphicx,epstopdf, lastpage, ifthen, lineno, float, amsmath, setspace, enumitem, mathpazo, booktabs, titlesec, etoolbox, tabto, xcolor, soul, multirow, microtype, tikz, totcount, amsthm, hyphenat, natbib, hyperref, footmisc, url, geometry, newfloat, caption
 
 \usepackage[export]{adjustbox}
+\usepackage{url}
 
 %=================================================================
 %% Please use the following mathematics environments: Theorem, Lemma, Corollary, Proposition, Characterization, Property, Problem, Example, ExamplesandDefinitions, Hypothesis, Remark, Definition, Notation, Assumption
@@ -111,9 +112,9 @@ $^{4}$ \quad CIMA Research Foundation, Savona, Italy}
 
 In the past few decades, wildland and wildland-urban interface (WUI) fires have received substantial attention due to their destructive nature and extensive cost in lives and property~\cite{thomas_2017,mcdermott_2019,richards_2020}. A large body of literature can be found on the subject, as seen in various review articles~\cite{Papadopoulos_2011,Bakhshaii_2019,mcdermott_2019}. Due to the complex nature of fire, limited computing resources, and the needs of planners and first responders, most models of wildfires have historically relied on simplified field-tested rules and correlations. Among these, the rate of spread model of Rothermel~\cite{Rothermel:1972} assumes quasi-steady state surface fire conditions and takes as inputs fuel properties, wind, terrain slope, and moisture that can be measured {\em in situ}. Fuel models have been cataloged~\cite{Anderson:1982}, and their parameters defined so that model users can select and combine the most appropriate listed fuels. Rothermel's rate of spread formula is still widely used, and has been implemented in several simulation tools~\cite{Finney:FARSITE,Bova:IJWF2015,FDS_Users_Guide,Coen:2,Coen:2015,LAUTENBERGER_2013,Coen:2013,Mandel:2009,Mandel:2011,Mandel:2014,Kochanski:2016}, enabling a range of planning and operational forecasting capabilities.
 
-Wildland fire modeling typically focuses on tracking the fire front, which can have a complex shape that moves and deforms based on local conditions like fuel loading, moisture content, wind, and terrain. The fire front requires a mathematical representation. The Lagrangian approach is based on a polygonal mesh of control markers that represents the front~\cite{Finney:FARSITE,Bova:IJWF2015}. On the other hand, an Eulerian representation allows for a fixed two-dimensional mesh on which the fire front is defined implicitly by a scalar field. This scalar field is called the level set function and numerical methods that compute the function are called Level Set Methods (LSM)~\cite{Sethian:1999,Osher:2006}. Some wildfire solvers that use LSM to track the fire front are described in references~\cite{coen_2013,Bova:IJWF2015,FDS_Users_Guide,LAUTENBERGER_2013}. A practical comparison of the two techniques as implemented in the Fire Dynamics Simulator (FDS)~\cite{Mell:IJWF2007} and FARSITE~\cite{Finney:FARSITE} is provided in reference~\cite{Bova:IJWF2015}.
+Wildland fire modeling typically focuses on tracking the fire front, which can have a complex shape that moves and deforms based on local conditions like fuel loading, moisture content, wind, and terrain. The fire front requires a mathematical representation. The Lagrangian approach is based on a polygonal mesh of control markers that represents the front~\cite{Finney:FARSITE,Bova:IJWF2015}. On the other hand, an Eulerian representation allows for a fixed two-dimensional mesh on which the fire front is defined implicitly by a scalar field. This scalar field is called the level set function and numerical methods that compute the function are called Level Set Methods (LSM)~\cite{Sethian:1999,Osher:2006}. Some wildfire solvers that use LSM to track the fire front are described in Refs.~\cite{coen_2013,Bova:IJWF2015,FDS_Users_Guide,LAUTENBERGER_2013}. A practical comparison of the two techniques as implemented in the Fire Dynamics Simulator (FDS)~\cite{Mell:IJWF2007} and FARSITE~\cite{Finney:FARSITE} is provided in Ref.~\cite{Bova:IJWF2015}.
 
-Because the spread rate of the fire front depends in part on the local wind conditions, a well resolved wind field over complex terrain should improve the accuracy of the overall model. The de facto physics-based technique for practical simulation of wind is Large Eddy Simulation (LES)~\cite{Linn:2007,coen_2013,Mell:IJWF2007}. For fire simulation over complex terrain, a range of techniques are being developed, in particular, in the coupling of the fire and the wind. For fast simulation of outdoor fires, an immersed boundary method has been interfaced with a Level Set scheme~\cite{Bova:IJWF2015} and the Rothermel fire spread model. The wind speed input for Rothermel's model results from the local velocity over the terrain which is affected by fire buoyancy and flow evolution. These are in turn also influenced by wind atmospheric conditions, accounted for within simulations using a mean wind forcing concept. This is a first step at implementing a level set approach in an LES wind calculation with combustion. It is recognized that in the empirically-based development of the Rothermel formula the wind speed is not influenced by the local buoyancy induced flow.
+Because the spread rate of the fire front depends in part on the local wind conditions, a well resolved wind field over complex terrain should improve the accuracy of the overall model. The de facto physics-based technique for practical simulation of wind is Large Eddy Simulation (LES)~\cite{Linn:2007,coen_2013,Mell:IJWF2007}. For fire simulation over complex terrain, a range of techniques are being developed, in particular, in the coupling of the fire and the wind. For fast simulation of outdoor fires, an immersed boundary method has been interfaced with a level set scheme~\cite{Bova:IJWF2015} and the Rothermel fire spread model. The wind speed input for Rothermel's model results from the local velocity over the terrain which is affected by fire buoyancy and flow evolution. These are in turn also influenced by wind atmospheric conditions, accounted for within simulations using a mean wind forcing concept. This is a first step at implementing a level set approach in an LES wind calculation with combustion. It is recognized that in the empirically-based development of the Rothermel formula the wind speed is not influenced by the local buoyancy induced flow.
 
 A number of other approaches to modeling fire spread over complex terrain exist. A recent review, with an emphasis on operational applications, is given in~\cite{Arca_2019}. A range of approximations to modeling both the wind and fire have been employed. The uniqueness of the approach presented here is that, within a single computational tool, a range of approximations to the wind and fire physics can be employed. This can support a direct comparison between models of varying physical fidelity. For example, one can investigate the difference in predicted fire behavior between a simulation that models fire spread and heat release via the explicit accounting of the thermal degradation of vegetation and one that approximates fire spread via an empirically based model. 
 
@@ -124,7 +125,7 @@ In the following section the mathematical model for fire spread over complex ter
 
 \subsection{Governing Equations} \label{sec:goveqns}
 
-For fire modeling in the gas phase, FDS employs a low Mach approximation for thermally driven buoyant and stratified flows~\cite{Rehm:1}. Under this assumption the pressure field $p$ can be viewed as the summation of two components: a background pressure $\bar{p}(z,t)$ used in the equation of state (ideal gas law), and a hydrodynamic pressure $\tilde{p}(x,y,z,t)$ resulting from fluid motion.
+For fire modeling in the gas phase, FDS employs a low Mach approximation for thermally driven buoyant and stratified flows~\cite{Rehm:1}. Under this assumption the pressure field $p$ can be viewed as the summation of two components: a background hydrostatic pressure field $\bar{p}(z,t)$ used in the equation of state (ideal gas law) and a hydrodynamic pressure $\tilde{p}(x,y,z,t)$ driving fluid motion.
 
 Consider a mixture composed of $N$ chemical species $\alpha$, moving on a fixed point $\mathbf{x}$ in space with a mass weighted average velocity $\mathbf{u}(\mathbf{x},t)$. If $\rho(\mathbf{x},t)$ is the mixture density, the mass fraction for species $\alpha$ is $Y_\alpha = \rho_\alpha / \rho$, where $\rho_\alpha(\mathbf{x},t)$ is the species mass density and $\rho = \sum \rho_\alpha$. The scalar transport and momentum equations take the form:
 \begin{eqnarray}
@@ -133,7 +134,9 @@ Consider a mixture composed of $N$ chemical species $\alpha$, moving on a fixed 
     \frac{\partial \mathbf{u}}{\partial t} - \mathbf{u} \times \boldsymbol{\omega} + \nabla H - \tilde{p} \, \nabla \left( 1/\rho\right) &=&
     \frac{1}{\rho} \left[ (\rho-\rho_0) \mathbf{g} + \mathbf{f}_{b} + \nabla \cdot \boldsymbol{\tau}^{dev} \right] \label{eqn:momtran}
 \end{eqnarray}
-where $\mathbf{J_{d}}_\alpha=- \rho D_\alpha \boldsymbol{\nabla} Y_\alpha$ is the diffusive flux for component $\alpha$. Fick's Law for binary diffusion with respect to a background species is assumed, and $D_\alpha$ is the diffusivity of $\alpha$ with respect to the background species.  Mass fractions $Y_\alpha$, solution of equations~\eqref{eqn:spectran}, must obey realizability constraints $0<Y_\alpha<1$ and $\sum_\alpha Y_\alpha=1$. In equations~\eqref{eqn:spectran} starting from a realizable solution, realizability implies $\sum_\alpha \mathbf{J_{d}}_\alpha = 0$. Therefore, to enforce realizability, errors in diffusive transport are lumped into the most abundant species locally~\cite{McDermott:2015}. The volumetric combustion source term for species $\alpha$ is $\dot{m}_\alpha'''(\mathbf{x},t)$  and $\dot{m}_{b,\alpha}'''$ is the contribution to species $\alpha$ from subgrid particle gasification. These correspond to the amount of mass per unit volume and time of species $\alpha$ being added or substracted in a given point $\mathbf{x}$ due to chemical reaction or gasification of solid particles (or droplets), respectively.  In the momentum equation the term $H=|\mathbf{u}|^2/2 + \tilde{p}/\rho$, $\tilde{p}$ is the perturbation pressure, and $\rho_0(z)$ is the modeled height dependent background density of the atmosphere.  Also, $\boldsymbol{\omega}$ refers to the vorticity field. The gravity vector is $\mathbf{g}=(0,0,g_z)$, the buoyancy force term is $ (\rho-\rho_0) \mathbf{g}$, $\mathbf{f}_{b}$ is the term contributed by modeled particle drag forces, and $\boldsymbol{\tau}^{dev}$ is the deviatoric stress tensor accounting for molecular and subgrid turbulent stresses parameterized by an effective eddy viscosity model, discussed below in Sec.~\ref{sec:subgrid}.
+where $\mathbf{J_{d}}_\alpha=- \rho D_\alpha \boldsymbol{\nabla} Y_\alpha$ is the diffusive flux for component $\alpha$. Fick's Law for binary diffusion with respect to a background species is assumed, and $D_\alpha$ is the diffusivity of $\alpha$ with respect to the background species.  Mass fractions $Y_\alpha$, solution of equations~\eqref{eqn:spectran}, must obey realizability constraints $0<Y_\alpha<1$ and $\sum_\alpha Y_\alpha=1$. In equations~\eqref{eqn:spectran} starting from a realizable solution, realizability implies $\sum_\alpha \mathbf{J_{d}}_\alpha = 0$. Therefore, to enforce realizability, errors in diffusive transport are lumped into the most abundant species locally~\cite{McDermott:2015}. The volumetric combustion source term for species $\alpha$ is $\dot{m}_\alpha'''(\mathbf{x},t)$;  the term $\dot{m}_{b,\alpha}'''$ is the contribution to species $\alpha$ from subgrid particle gasification. These correspond to the amount of mass per unit volume and time of species $\alpha$ being added or substracted in a given point $\mathbf{x}$ due to chemical reaction or gasification of solid particles (or droplets), respectively.  Details of the combustion model are provided below in Sec.~\ref{sec:subgrid}.
+
+In the momentum equation the term $H=|\mathbf{u}|^2/2 + \tilde{p}/\rho$, $\tilde{p}$ is the perturbation pressure, and $\rho_0(z)$ is the modeled height dependent background density of the atmosphere.  Also, $\boldsymbol{\omega}$ refers to the vorticity field. The gravity vector is $\mathbf{g}=(0,0,g_z)$, the buoyancy force term is $ (\rho-\rho_0) \mathbf{g}$, $\mathbf{f}_{b}$ is the term contributed by modeled particle drag forces, and $\boldsymbol{\tau}^{dev}$ is the deviatoric stress tensor accounting for molecular and subgrid turbulent stresses parameterized by an effective eddy viscosity model, discussed below in Sec.~\ref{sec:subgrid}.
 
 Conservation of energy is achieved by forcing the flow field to obey the following thermodynamic divergence constraint:
 \begin{eqnarray}
@@ -167,11 +170,11 @@ The constant $C$ is computed at each time step so that the volume integral of Eq
 
 The radiation equation is solved using a technique similar to a finite volume method for convective transport, thus the name given to it is the Finite Volume Method (FVM). Using approximately 100 discrete angles which are updated over multiple time steps, the finite volume solver requires about 20\% of the total CPU time of a calculation, a modest cost given the complexity of radiation heat transfer.
 
-Section~\ref{particle_model} discusses how Lagrangian particles are used to represent vegetation like leaves, pine needles and so on. These particles absorb and emit thermal radiation, and the underlying assumptions are described in that section.
+Section~\ref{particle_model} discusses how Lagrangian particles are used to represent vegetation like leaves, pine needles and other subgrid objects. These particles absorb and emit thermal radiation, and the underlying assumptions are described in that section.
 
 \subsection{Subgrid Parameterizations} \label{sec:subgrid}
 
-In the formal derivation of the LES equations (see, e.g, \cite{Pope:2000,FDS_Math_Guide}) the filtered nonlinear terms (advection terms, mean chemical source term, and the unresolved boundary fluxes) require subgrid-scale parameterizations.  In this section we will temporarily utilize the LES filter formalism as well as Cartesian tensor index notation to clarify the terms used in the governing equations.
+In the formal derivation of the LES equations (see, e.g, \cite{Pope:2000,FDS_Math_Guide}) the filtered nonlinear terms (advection terms, mean chemical source term, and the unresolved boundary fluxes) require subgrid-scale parameterizations.  In this section, LES filter notation as well as Cartesian tensor index notation are used to clarify the terms used in the governing equations.
 
 \subsubsection{Subgrid Advection}
 
@@ -187,28 +190,28 @@ In FDS the deviatoric part of the subgrid stress tensor is modeled using the gra
 \end{equation}
 where the symmetric rate-of-strain tensor is $S_{ij} \equiv \frac{1}{2}(\partial u_i/\partial x_j + \partial u_j/\partial x_i)$ and $\mu_t$ is an isotropic eddy viscosity.  Note that $\overline{\tau}_{ij}$ is already the deviatoric part of the molecular stress as the isotropic part is the pressure; $\mu$ is the molecular dynamic viscosity.
 
-The eddy viscosity $\mu_t$ is an important quantity in the simulation as it affects all the turbulent transport and subgrid mixing time scales, which, as we will see below, are crucial to the combustion model.  In FDS, the eddy viscosity is modeled as \cite{Pope:2000,Deardorff:1980}
+The eddy viscosity $\mu_t$ is an important quantity in the simulation as it affects all the turbulent transport and subgrid mixing time scales, which, as shown below, are crucial to the combustion model.  In FDS, the eddy viscosity is modeled as \cite{Pope:2000,Deardorff:1980}
 \begin{equation}
 \mu_t = \bar{\rho} C_\nu \Delta \sqrt{k_{sgs}}
 \end{equation}
-with the constant taken as $C_\nu = 0.1$ (this value can be derived assuming production equals dissipation and a model Kolmogorov spectrum \cite{Pope:2000}; we also test the model against decaying isotropic turbulence \cite{CBC}).  In practice, the filter scale $\Delta$ is taken as the cube root of the cell volume.  Deardorff \cite{Deardorff:1980} solved a transport equation for the subgrid kinetic energy per unit mass, $k_{sgs}$, in order to account for subgrid buoyancy. In FDS, the density field is sufficiently resolved to account for buoyant plume accelerations, and therefore we find that an algebraic closure for $k_{sgs}$ is sufficient.  We utilize a scale-similarity idea, following the work of Bardina \cite{Bardina:1980}, and model the subgrid kinetic energy per unit mass as follows:
+with the constant taken as $C_\nu = 0.1$ (this value can be derived assuming production equals dissipation and a model Kolmogorov spectrum \cite{Pope:2000}; the model is also tested against decaying isotropic turbulence \cite{CBC}).  In practice, the filter scale $\Delta$ is taken as the cube root of the cell volume.  Deardorff \cite{Deardorff:1980} solved a transport equation for the subgrid kinetic energy per unit mass, $k_{sgs}$, in order to account for subgrid buoyancy. In FDS, the density field is sufficiently resolved to account for buoyant plume accelerations, and therefore it is found that an algebraic closure for $k_{sgs}$ is sufficient.  Following the work of Bardina \cite{Bardina:1980}, a scale-similarity idea is used; the subgrid kinetic energy per unit mass is modeled as follows:
 \begin{equation}
 k_{sgs} = \frac{1}{2}(\tilde{u}_i - \hat{\tilde{u}}_i)(\tilde{u}_i - \hat{\tilde{u}}_i)
 \end{equation}
 where the hat represents a test filter at a scale $2\Delta$.  For the first Cartesian cell off the wall, where a test filter is not well defined, the eddy viscosity is taken from the WALE model \cite{Nicoud:1999}.
 
-Subgrid advection of mass and heat are also modeled using gradient diffusion.  The turbulent diffusivities use constant turbulent Schmidt and Prandtl numbers, both set to 0.5; this simplification is justified based on high resolution simulations of fire plumes (see, e.g., \cite{Maragkos:2020}). For mass diffusion of species $\alpha$ in direction $i$ we have
+Subgrid advection of mass and heat are also modeled using gradient diffusion.  The turbulent diffusivities use constant turbulent Schmidt and Prandtl numbers, both set to 0.5; this simplification is justified based on high resolution simulations of fire plumes (see, e.g., \cite{Maragkos:2020}). For mass diffusion of species $\alpha$ in direction $i$ the flux is
 \begin{equation}
 J_{\alpha,i} = \bar{J}_{\alpha,i} + J_{\alpha,i}^{sgs} = -\bar{\rho}(D_\alpha + \frac{\mu_t}{\mathrm{Sc}_t}) \frac{\partial \tilde{Y}_\alpha}{\partial x_i}
 \end{equation}
-We use effective thermal conductivity and mass diffusivity in the heat flux, which may be written as
+Effective thermal conductivity and mass diffusivity are used in the heat flux, which may be written as
 \begin{equation}
 {\dot{q}''}_i = -(\bar{k} + \frac{\mu_t \bar{c}_p}{\mathrm{Pr}_t}) \frac{\partial \widetilde{T}}{\partial x_i} - \sum_\alpha \tilde{h}_{{\rm s},\alpha} ( \bar{\rho} D_\alpha + \frac{\mu_t}{\mathrm{Sc}_t} ) \frac{\partial \tilde{Y}_\alpha }{\partial x_i}
 \end{equation}
 
 \subsubsection{Filtered Chemical Source Term}
 
-FDS treats combustion chemistry using a simplified approach.  We track only Fuel, Air, and Products, which we refer to as ``lumped species''.  Lumped species are groups of species that transport and react together and are always found in the same proportion.  For example, Air is a lumped species made up of 23 \% O$_2$ and 77 \% N$_2$ by mass.  For vegetation, a surrogate hydrocarbon Fuel is usually assumed.  For example, cellulose may be assumed to decompose to a volatile fuel gas with the formula $\C_{6} \H_{10} \O_{5}$.  The Products are defined stoichiometrically, often including prescribed yields of soot (for smoke) and carbon monoxide that may be obtained from empirical relationships for the specific fuel or from other sources (e.g., \cite{SFPE:Mulholland}).  Then, usually, a single reaction is tracked\footnote{More complicated reaction schemes are possible in the code, but for this work a single reaction is sufficient.}:
+FDS treats combustion chemistry using a simplified approach.  Only Fuel, Air, and Products, referred to as ``lumped species'', are tracked.  Lumped species are groups of species that transport and react together and are always found in the same proportion.  For example, Air is a lumped species made up of 23 \% O$_2$ and 77 \% N$_2$ by mass.  For vegetation, a surrogate hydrocarbon Fuel is usually assumed.  For example, cellulose may be assumed to decompose to a volatile fuel gas with the formula $\C_{6} \H_{10} \O_{5}$.  The Products are defined stoichiometrically, often including prescribed yields of soot (for smoke) and carbon monoxide that may be obtained from empirical relationships for the specific fuel or from other sources (e.g., \cite{SFPE:Mulholland}).  Then, usually, a single reaction is tracked\footnote{More complicated reaction schemes are possible in the code, but for this work a single reaction is sufficient.}:
 \begin{equation}
 \mathrm{Fuel} + s \, \mathrm{Air} \rightarrow (1+s) \,\mathrm{Products}
 \end{equation}
@@ -236,15 +239,15 @@ where $\Delta h_{f,\alpha}$ are the heats of formation for each lumped species $
 \paragraph{Flame Extinction} One of the advantages of a physics-based tool like FDS is the possibility of building into the model the effects of defensive actions on the fire spread rate.  FDS uses simple empirical rules to predict local extinction within a gas phase grid cell based on resolved species concentrations and the mean cell temperature. The rules are based on the concept of a critical flame temperature. The basic theory behind the critical flame temperature is described in \cite{SFPE:Beyler}.  In brief, if the local heat release given by Eq.~(\ref{eq:qdotppp}) is not sufficient to raise the cell temperature above the CFT, then $\overline{\dot{m}_{F}'''}$ is set to zero for that cell for that time step.  Note that the flame extinction model does not directly affect surface cooling or smothering of the vegetative fuel, which may happen with certain fire suppression activities.  However, such tactics can be accounted for through modifications to the solid fuel thermal degradation model discussed below.
 
 \subsubsection{Unresolved Boundary Fluxes}
-
-In this section we discuss the wall functions used to close the mass, momentum, and energy fluxes on solid boundaries.  Mass transfer of moisture and fuel from the surface is discussed in more detail below in Sec.~\ref{sec:firespread} where the various flames spread models are compared (which is really the main point of this paper).
+\label{sec:boundflx}
+In this section, the wall functions used to close the mass, momentum, and energy fluxes on solid boundaries are discussed.  Mass transfer of moisture and fuel from the surface is discussed in more detail below in Sec.~\ref{sec:firespread} where the various flames spread models are compared (which is really the main point of this paper).
 
 The scaled streamwise velocity is denoted $u^+ = u/u_\tau$, where the friction velocity is $u_\tau \equiv \sqrt{\tau_w/\rho}$ and $\tau_w$ is the wall stress needed to close the momentum equation, Eq.~(\ref{eqn:momtran}).  For rough walls FDS employs the log law presented in \cite{Pope:2000},
 \begin{equation}
 \label{eqn_roughwallloglaw}
 u^+ = \frac{1}{\kappa} \ln \left(\frac{y}{s}\right) + \tilde{B}(s^+)
 \end{equation}
-where $\kappa = 0.41$ is the von K\'arm\'an constant, $s^+ = s/\delta_\nu$ is the roughness length in viscous units, $s$ is the dimensional ``sand grain'' roughness, and $\delta_\nu = \mu/(\rho u_\tau)$ is the viscous length scale. The distance to the wall, $y$, is taken as $\delta y/2$ for the first off-wall grid cell.  The parameter $\tilde{B}$ varies with $s^+$ but attains a constant value $B_2=8.5$ in the fully rough limit.  In FDS, we implement $\tilde{B}$ as the following piece-wise function:
+where $\kappa = 0.41$ is the von K\'arm\'an constant, $s^+ = s/\delta_\nu$ is the roughness length in viscous units, $s$ is the dimensional ``sand grain'' roughness, and $\delta_\nu = \mu/(\rho u_\tau)$ is the viscous length scale. The distance to the wall, $y$, is taken as $\delta y/2$ for the first off-wall grid cell.  The parameter $\tilde{B}$ varies with $s^+$ but attains a constant value $B_2=8.5$ in the fully rough limit.  In FDS, $\tilde{B}$ is implemented as the following piece-wise function:
 \begin{equation}
 \tilde{B} = \left\{ \begin{array}{lll} B + (1/\kappa)\ln(s^+) & \mbox{for} & s^+ < 5.83 \\
 \tilde{B}_{\rm max} & \mbox{for} & 5.83 \le s^+ < 30.0 \\
@@ -271,7 +274,7 @@ h = \max \left[C\, |T_g-T_w|^{1/3} \; , \;
 \end{equation}
 where $C$ is a empirical coefficient for natural convection (1.52 for a horizontal plate and 1.31 for a vertical plane or cylinder)~\cite{Holman:1}, $L$ is a characteristic length related to the size of the physical obstruction, and $k$ is the thermal conductivity of the gas. The forced convection Nusselt number (Nu) depends on the geometry and flow characteristics \cite{Holman:1,Incropera:1}.  Further details are provided in \cite{FDS_Math_Guide}.
 
-Again, this simple approach is viable because FDS usually resolves the thermal flow fields that would necessitate added complexity.  However, in future work we plan to explore improvements to wall functions that may lead to better results at coarser grid resolution.
+Again, this simple approach is viable because FDS usually resolves the thermal flow fields that would necessitate added complexity.  However, future work is planned to explore improvements to wall functions that may lead to better results at coarser grid resolution.
 
 
 \section{Terrain Description and Discretization} \label{sec:terraindisc}
@@ -287,19 +290,19 @@ In Fig.~\ref{Fig:figure_1}, the terrain is represented by its surface triangulat
 \end{figure}
 
 
-\subsection{Scalar transport and energy discretization in unstructured region}
+\subsection{Cut-cell Scalar Transport and Energy Discretization}
 
 The equations for chemical species transport are discretized using the finite volume method (FV)~\cite{eymard_2000,leveque_2002}, as outlined in the diagram of Fig.~\ref{Fig:figure_2}. Integrating Eq.~(\ref{eqn:spectran}) over a cut-cell $ii$ with control volume $\Omega_{ii}$:
 \begin{equation}
  \int_{\Omega_{ii}} {\frac{\partial \rho Y_\alpha}{\partial t}} \, \dV + \int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot  \left(  \rho Y_\alpha \mathbf{u} \right)
       } \, \dV  = -\int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot \mathbf{J_{d}}_\alpha   } \, \dV + \int_{\Omega_{ii}} { \left( \dot{m}_\alpha'''+\dot{m}_{b,\alpha}''' \right) } \, \dV \label{eq:intconvdiff}
 \end{equation}
-For a control volume that does not change with time, the time derivative and source terms are approximated by
+For a cut-cell control volume the time derivative and source terms are approximated by
 \begin{equation}
-  \int_{\Omega_{ii}} {\frac{\partial \rho Y_\alpha}{\partial t}} \, \dV \approx \frac{\partial \widetilde{\rho Y_\alpha }_{ii}}{\partial t} V_{ii} \quad ; \quad
-  \int_{\Omega_{ii}} { \left( \dot{m}_\alpha''' +\dot{m}_{b,\alpha}''' \right)} \, \dV \approx \left(\widetilde{ \dot{m}_\alpha''' }_{ii}+ \widetilde{\dot{m}_{b,\alpha}'''}_{ii} \right) V_{ii} \label{eq:intcons}
+  \int_{\Omega_{ii}} {\frac{\partial \rho Y_\alpha}{\partial t}} \, \dV \approx \frac{\partial \overline{\rho Y_\alpha }_{ii}}{\partial t} V_{ii} \quad ; \quad
+  \int_{\Omega_{ii}} { \left( \dot{m}_\alpha''' +\dot{m}_{b,\alpha}''' \right)} \, \dV \approx \left(\overline{ \dot{m}_\alpha''' }_{ii}+ \overline{\dot{m}_{b,\alpha}'''}_{ii} \right) V_{ii} \label{eq:intcons}
 \end{equation}
-where $V_{ii}$ is the volume of cell $ii$ and tildes imply cell averages. In the following the notation is simplified by dropping tildes, observing that quantities are cell or face averaged. Consider the FV discretization of the diffusive term of Eq.~(\ref{eq:intconvdiff}) on cut-cell $ii$ of Fig.~\ref{Fig:figure_2}:
+where $V_{ii}$ is the volume of cell $ii$ and the overlines imply cell averages. In the following the notation is simplified by dropping overlines, observing that quantities are cell or face averaged. Consider the FV discretization of the diffusive term of Eq.~(\ref{eq:intconvdiff}) on cut-cell $ii$ of Fig.~\ref{Fig:figure_2}:
 \begin{equation}
 \int_{\Omega_{ii}} { \boldsymbol{\nabla} \cdot   \mathbf{J_{d}}_\alpha   } \, \dV =
     \int_{\partial \Omega_{ii}} { \left( - \rho D_\alpha \boldsymbol{\nabla} Y_\alpha \right) \cdot \hat{\mathbf{n}}_{ii} } \, \dS = \sum^{n_{\rm f}}_{k=1}
@@ -320,7 +323,7 @@ Similarly, the discretization of the advective term is:
      \int_{\partial \Omega_{ii}} { \left( \rho Y_\alpha \mathbf{u} \right) \cdot \hat{\mathbf{n}}_{ii} } \, \dS \approx
      \sum^{n_{\rm f}}_{k=1} \left( \rho Y_\alpha \mathbf{u} \right)_k \cdot \hat{\mathbf{n}}_{ii,k} \, A_k \label{eq:discfvadvcc}
 \end{equation}
-where the advective flux for face $k$ is $\left( \rho Y_\alpha \mathbf{u} \right)_k = \overline{[\rho Y_\alpha]}_k \mathbf{u}_k$, and the over bar in $\overline{[\rho Y_\alpha]}_k$ means it is a flux-limited interpolation to the cut-face~\cite{FDS_Users_Guide}. In the cut-cell region a Godunov flux limited interpolation for the advective term is used. Flux limited interpolation is one of the fundamental components of stable numerical schemes for hyperbolic equations, of which mass transport inherits its mathematical properties.
+where the advective flux for face $k$ is $\left( \rho Y_\alpha \mathbf{u} \right)_k = \overline{[\rho Y_\alpha]}_k \mathbf{u}_k$, and the over bar in $\overline{[\rho Y_\alpha]}_k$ means it is a flux-limited interpolation to the cut-face~\cite{FDS_Users_Guide}. In the cut-cell region a Godunov flux limited interpolation for the advective term is used. Flux limited interpolation is one of the fundamental components of stable numerical schemes for hyperbolic equations~\cite{leveque_2002}, of which mass transport inherits its mathematical properties.
 The time integration scheme in FDS is an explicit Runge-Kutta (RK2) method, all variables in the right hand side of Eqs.~\eqref{eq:discfvdiffcc}-\eqref{eq:discfvadvcc} are assumed known. Explicit Runge-Kutta time integration methods are single-step multistage schemes widely used for advancing ordinary and partial differential equations~\cite{leveque2007finite}. The FV counterpart of the thermodynamic divergence expression for cut-cell $ii$ is:
 \begin{eqnarray}
     ( \nabla \cdot \mathbf{u} )_{ii}^{\rm th} \; V_{ii} &=&
@@ -334,12 +337,12 @@ The time integration scheme in FDS is an explicit Runge-Kutta (RK2) method, all 
     \sum_{k=1}^{n_{\rm f}} \mathbf{J}_{\alpha,ii,k} \cdot \hat{\mathbf{n}}_{ii,k} \: A_k
     - \overline{\mathbf{u} \cdot \nabla (\rho Y_\alpha)} V_{ii} \right] \nonumber \label{eq:divth2}
 \end{eqnarray}
-where the over line terms refer to flux limited interpolation of corresponding scalars, and terms defined with subscript $ii$ refer to cell defined quantities. All heat and mass fluxes and scalars are assumed known. Also, the vertical velocity $w_{ii}$ is interpolated to the cut-cell centroid. Details of the FDS time integration scheme can be found in references~\cite{FDS_Users_Guide,mcdermo_2014}. For each RK2 substep, the species transport equations are advanced in all FDS Cartesian cells, and then the solution (explicit fluxes and scalar densities) recomputed on the unstructured cut-cell region. A similar procedure is done for the thermodynamic divergence.
+where the over line terms refer to flux limited interpolation of corresponding scalars, and terms defined with subscript $ii$ refer to cell defined quantities. All heat and mass fluxes and scalars are assumed known. Also, the vertical velocity $w_{ii}$ is interpolated to the cut-cell centroid. Details of the FDS time integration scheme can be found in references~\cite{FDS_Users_Guide,mcdermo_2014}. For each RK2 substep, the species transport equations are advanced in all FDS Cartesian cells, and then the solution (explicit fluxes and scalar densities) is recomputed on the unstructured cut-cell region. A similar procedure is done for the thermodynamic divergence.
 % Small cell linking for explicit time integration.
-As an explicit time integrator is used, in general there will arise cut-cells whose small-size will penalize severely the time step. These cut-cells are linked to larger surrounding cells. Cell linking in the context of momentum equations can be found in Ref.~\cite{kirk_2003}. In FDS, the momentum equations and pressure Poisson equation are solved on the Cartesian mesh. Therefore, an immersed boundary method is used to reconstruct velocities in the cut-cell region. A divergence integral equivalence argument is used to transfer the divergence from cut-cells to the underlying Cartesian cells in order to build the source term of the Poisson equation for the pressure.
+As an explicit time integrator is used, in general there will arise cut-cells whose small size will penalize severely the time step. These cut-cells are linked to larger surrounding cells. Cell linking in the context of momentum equations can be found in Ref.~\cite{kirk_2003}. In FDS, the momentum equations and pressure Poisson equation are solved on the Cartesian mesh. Therefore, an immersed boundary method is used to reconstruct velocities in the cut-cell region. A divergence integral equivalence argument is used to transfer the divergence from cut-cells to the underlying Cartesian cells in order to build the source term of the Poisson equation for the pressure.
 
 
-\subsection{Immersed boundary method on cut-cell region and wall modeling}
+\subsection{Immersed Boundary Method and Wall Modeling}
 
 Collecting advective, shear stress and force terms in $\mathbf{F}(\mathbf{u},\mathbf{x},t)$ within Eq.~(\ref{eqn:momtran}), the model momentum transport problem can be written~\cite{FDS_Users_Guide}:
 \begin{eqnarray}
@@ -349,17 +352,17 @@ Collecting advective, shear stress and force terms in $\mathbf{F}(\mathbf{u},\ma
 where Eq.~\eqref{eq:LowMachMom} is the momentum equation, subject to a specified divergence field, provided by Eq.~\eqref{eq:divth}.
 Boundary conditions are prescribed for $\mathbf{u}(\mathbf{x},t)$ on boundaries, including the immersed terrain.
 
-The previous equations are advanced in time using a fractional step method. As illustration, consider their Forward Euler (FE) update from $t_n$ to $t_{n+1}=t_n + \Delta t$. Given $ \mathbf{u}^n=\mathbf{u}(\mathbf{x},t_n)$, $\nabla \cdot \mathbf{u}^{n+1} = \left( \nabla \cdot \mathbf{u}^{n+1} \right)^{\rm th}$ known
+The previous equations are advanced in time using a fractional step method. As illustration, consider their Forward Euler (FE) update from $t_n$ to $t_{n+1}=t_n + \Delta t$. Given $ \mathbf{u}^n=\mathbf{u}(\mathbf{x},t_n)$, $\left( \nabla \cdot \mathbf{u} \right)^{\mathrm{th},\,n+1}$ are known:
 \begin{eqnarray}
   \frac{\mathbf{u}^{n+1}-\mathbf{u}^{n}}{\Delta t} &=& - \mathbf{F}^n -  \boldsymbol{\nabla} H^n \label{eq:LowMachMomEu}\\
-  \nabla \cdot \mathbf{u}^{n+1} &=& \left( \nabla \cdot \mathbf{u}^{n+1} \right)^{\rm th} \label{eq:LowMachDivEu}
+  \nabla \cdot \mathbf{u}^{n+1} &=& \left( \nabla \cdot \mathbf{u} \right)^{\mathrm{th},\,n+1} \label{eq:LowMachDivEu}
 \end{eqnarray}
-where $\mathbf{u}^{n+1}$ represents a numerical solution at time $t_{n+1}$. This discrete FE update corresponds to the first sub-step of the FDS explicit RK2 integrator. As the potential field $H(\mathbf{x},t)$ does not have a time evolution equation, it is assumed responsible for enforcing the divergence condition and used on the projection step. Taking the divergence of Eq.~\eqref{eq:LowMachMomEu} and considering  the constraint, Eq.~\eqref{eq:LowMachDivEu}, the two steps of the method are
+where $\mathbf{u}^{n+1}$ represents a numerical solution at time $t_{n+1}$. This discrete FE update corresponds to the first sub-step of the FDS explicit RK2 integrator. The potential field $H(\mathbf{x},t)$ does not have a time evolution equation, it is responsible for enforcing the divergence condition and used on the projection step. Taking the divergence of Eq.~\eqref{eq:LowMachMomEu} and considering  the constraint, Eq.~\eqref{eq:LowMachDivEu}, the two steps of the method are
 \begin{enumerate}
   \item Solve Poisson equation for $H^n$:
 
 \begin{equation}
-   \nabla \cdot \boldsymbol{\nabla} H^n = - \left[ \frac{\left( \nabla \cdot \mathbf{u}^{n+1} \right)^{\rm th} - \nabla \cdot \mathbf{u}^{n}}{\Delta t} \right] - \nabla \cdot \mathbf{F}^n \label{it:FSPoisson}
+   \nabla \cdot \boldsymbol{\nabla} H^n = - \left[ \frac{\left( \nabla \cdot \mathbf{u} \right)^{\mathrm{th},\,n+1} - \nabla \cdot \mathbf{u}^{n}}{\Delta t} \right] - \nabla \cdot \mathbf{F}^n \label{it:FSPoisson}
 \end{equation}
 
   \item Obtain final velocity for step:
@@ -369,11 +372,11 @@ where $\mathbf{u}^{n+1}$ represents a numerical solution at time $t_{n+1}$. This
    \end{equation}
 
 \end{enumerate}
-A consequence of the projection scheme is that boundary conditions are required on the Poisson equation, \eqref{it:FSPoisson}. For explicit methods and stationary \textit{solid} boundaries, the corresponding boundary condition is \textit{homogeneous} Neumann for $H^n$ in $\partial \Omega,\partial \Omega_1,...,\partial \Omega_{\rm nbods}$~\cite{perot_1993}.
+A consequence of the projection scheme is that boundary conditions are required on the Poisson equation, Eq.~\eqref{it:FSPoisson}. For explicit methods and stationary \textit{solid} boundaries, the corresponding boundary condition is \textit{homogeneous} Neumann for $H^n$ in $\partial \Omega,\partial \Omega_1,...,\partial \Omega_{\rm nbods}$~\cite{perot_1993}.
 Next, an approximation to the no-slip boundary condition at the immersed terrain surface is needed. To this end, a direct forcing immersed boundary method (IBM) for the momentum equations~\cite{fadlun_2000} is employed. A force field is computed on the discrete momentum equations on grid faces crossed by the immersed surfaces to approximate the no-slip boundary condition on these. In LES, the surrounding velocity field is modeled using an equilibrium boundary layer solution.
 
 In Fig.~\ref{Fig:figure_2}, the velocity update in each of the gas phase cut-face centroids $d$ is done individualizing the point $B$ on the boundary and normal direction through these. Also, and external point $e_x$ through the normal $\mathbf{\hat{n}}$ is defined at a distance $\delta_{ex}$, of the order of the Cartesian cells size. Known velocities and fluid parameters are interpolated from the surrounding fluid points $e_1,\dots,e_4$ to $e_x$.
-This information is used to estimate a target velocity at step $n+1$, $\mathbf{\hat{u}}_d^{n+1,k-1}$ at point $d$, assuming the log law equilibrium boundary layer solution~\cite{FDS_Users_Guide}. The target velocity $\hat{u}_d^{n+1,k-1}$ component on the cut-face centroid is flux-matched to the underlying Cartesian face $E$ velocity component $\hat{u}_E^{n+1,k-1}$. Finally, an immersed boundary force
+This information is used to estimate a target velocity at step $n+1$, $\mathbf{\hat{u}}_d^{n+1,k-1}$ at point $d$, assuming the log law equilibrium boundary layer solution of section~\ref{sec:boundflx}. The target velocity $\hat{u}_d^{n+1,k-1}$ component on the cut-face centroid is flux-matched to the underlying Cartesian face $E$ velocity component $\hat{u}_E^{n+1,k-1}$. Finally, an immersed boundary force
 \begin{equation}
 F_E^k=-\frac{\hat{u}_E^{n+1,k-1}-u_E^{n}}{\Delta t} - \frac{\partial H^{n,k-1}}{\partial x}
 \label{eq:FIBM}
@@ -413,7 +416,7 @@ $M$ is the vegetation {\em moisture content} or {\em moisture fraction} determin
 \subsection{Particle Model}
 \label{particle_model}
 
-Lagrangian particles represent different types of vegetation, like leaves, grass, and so on. Each type of vegetation is represented by a single particle in each computational grid cell. Most often the particle is assumed to be cylindrical in shape, but it can be spherical or planar. The particle is assigned a diameter based on the measured surface area to volume ratio, $\sigma'$. The length is relatively unimportant so long as it is assumed to be much greater than the diameter. Material properties are assigned for the wet vegetation which is assumed to dry, decompose to char, and then exothermally oxidize when exposed to heat from an oncoming fire. The drag force exerted by the collection of particles is given by:
+Lagrangian particles represent different types of vegetation, like leaves, grass, and pine needles. Each type of vegetation is represented by a single particle in each computational grid cell\footnote{Multiple particles within a cell are permitted, but may not be the most computationally efficient approach.}. Most often the particle is assumed to be cylindrical in shape, but it can be spherical or planar. The particle is assigned a diameter based on the measured surface area to volume ratio, $\sigma'$. The length is relatively unimportant so long as it is assumed to be much greater than the diameter. Material properties are assigned for the wet vegetation which is assumed to dry, decompose to char, and then exothermally oxidize when exposed to heat from an oncoming fire. The drag force exerted by the collection of particles is given by:
 \begin{equation}
    \mathbf{f}_{\rm b} = \frac{\rho}{2} \, C_{\rm d} \, C_{\rm s} \, \beta \, \sigma' \, \mathbf{u} \, \|\mathbf{u}\|
    \label{drag}
@@ -486,7 +489,7 @@ where $\mathbf{R}_{uv}=(R_u,R_v)$ is the spread rate vector. The magnitude of th
 \begin{equation}
   \|\mathbf{R}_{uv}\|=R_0 \left(1 + \sqrt{(\boldsymbol{\phi}_W+\boldsymbol{\phi}_S) \cdot (\boldsymbol{\phi}_W+\boldsymbol{\phi}_S) } \right)
 \end{equation}
-where $R_0$ is the zero velocity, zero slope rate of spread that depends on the fuel properties. The vectors $\boldsymbol{\phi}_W,\boldsymbol{\phi}_S \ge 0$ are computed using the local wind and slope through empirical rules~\cite{Wilson:1980}. See Appendix 1 of reference~\cite{Bova:IJWF2015} for details on these calculations. In FDS, the level set spread model can be applied in various ways:
+where $R_0$ is the zero velocity, zero slope rate of spread that depends on the fuel properties. The vectors $\boldsymbol{\phi}_W,\boldsymbol{\phi}_S \ge 0$ are computed using the local wind and slope through empirical rules~\cite{Wilson:1980}. See Appendix 1 of Ref~\cite{Bova:IJWF2015} for details on these calculations. In FDS, the level set spread model can be applied in various ways:
 \begin{enumerate}
 \item Only the level set simulation is performed, with a constant and uniform specified wind and slope. The wind is not affected by the terrain, and there is no fire.
 \item The wind field is established over the terrain, but it is ``frozen'' when the fire ignites.
@@ -526,9 +529,9 @@ It is possible in FDS to superimpose synthetic turbulence on a specified inlet p
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.45\textwidth,valign=c]{figures/sem_open_wind_contours.pdf}
-\includegraphics[width=0.5\textwidth,valign=c]{figures/sem_open_wind_u_prof.pdf}
-\caption{Example of inflow synthetic turbulence superimposed on a Monin-Obukhov boundary layer profile. Contours of the normal component of velocity at the domain inlet taken at time midway through the simulation (left); mean and rms profiles along the inlet compared with specified profiles (right).  The MO parameters are $L=-667\;\mathrm{m}$, $z_0=0.022\;\mathrm{m}$, and $u_r=10\;\mathrm{m/s}$ and $T_r=20\;^\circ\mathrm{C}$ at reference height of 10 m.  SEM turbulence parameters were 10 \% turbulence intensity and an eddy integral length scale of 3 m.}
+\includegraphics[width=0.5\textwidth,valign=c]{figures/sem_open_wind_contours.pdf}
+\includegraphics[width=0.48\textwidth,valign=c]{figures/sem_open_wind_u_prof.pdf}
+\caption{Example of inflow synthetic turbulence superimposed on a Monin-Obukhov boundary layer profile. Contours of the normal component of velocity at the domain inlet taken at a time midway through the simulation (left); mean and rms profiles along the inlet compared with specified profiles (right).}
 \label{fig:semprofs}
 \end{figure}
 
@@ -538,7 +541,7 @@ Other approaches to imposing boundary layer turbulence are possible (e.g., \cite
 
 The Poisson equation for $H$, Eq.~(\ref{it:FSPoisson}), links the momentum equation with mass and energy in the low-Mach flow algorithm.  The boundary conditions for this equation determine the inflow and outflow velocity component values.  Let $\mathbf{n}$ denote a unit normal vector pointing \emph{into} the domain.  Boundary values at an interface are denoted with a subscript ``$I$''.  Then $\mathbf{u}_I\cdot\mathbf{n}>0$ is an inflow and $\mathbf{u}_I\cdot\mathbf{n}<0$ is an outflow condition.
 
-At an inflow, generally the mean viscous and convective forces are small and we make use of a simplified momentum equation that approximates $\partial u_i/\partial t = -\partial H/\partial x_i$.  Let $u$ denote the $x$-component of velocity and consider an interface normal to $x$ pointing into the domain.  The prescribed external wind field velocity component at height $z$ and time $t$ (discussed above in Sec.~\ref{sec:veltmpprof}) is denoted $u_{wind}(z,t)$.  Using a one-sided difference for $H$ and an explicit Euler approximation of the velocity time derivative, the boundary value for $H$ may be written as 
+At an inflow, generally the mean viscous and convective forces are small and a simplified momentum equation   may be used to develop a boundary value for $H$, namely, $\partial u_i/\partial t = -\partial H/\partial x_i$. To develop the boundary condition, let $u$ denote the $x$-component of velocity and consider an interface normal to $x$ pointing into the domain.  The prescribed external wind field velocity component at height $z$ and time $t$ (discussed above in Sec.~\ref{sec:veltmpprof}) is denoted $u_{wind}(z,t)$.  Using a one-sided difference for $H$ and an explicit Euler approximation of the velocity time derivative, the boundary value for $H$ may be written as 
 \begin{equation}
 \label{eq:Hin}
 H_I = H_{I\pm\frac{1}{2}}^n \pm \frac{\Delta x}{2}\left[\frac{u_{wind,I}(z,t) - u_I^n}{\Delta t}\right] \quad \mbox{if} \quad \mathbf{u}_I\cdot\mathbf{n}>0
@@ -563,15 +566,8 @@ Measured bulk properties of the grasses burned in the two experiments are listed
 
 \begin{figure}[p]
 \includegraphics[width=\textwidth]{figures/F19_collage.png}
-\caption{Photographs of the experiment and snapshots of the simulation of CSIRO Grassland Fire F19, 56~s, 86~s, and 138~s following ignition.}
+\caption{Photographs of the experiment and snapshots of the simulation (medium resolution Particle Model) of CSIRO Grassland Fire F19, 56~s, 86~s, and 138~s following ignition.}
 \label{F19}
-\end{figure}
-
-\begin{figure}[ht]
-\includegraphics[width=0.49\textwidth]{figures/Case_F19_flame_position.pdf}
-\includegraphics[width=0.49\textwidth]{figures/Case_C064_flame_position.pdf}
-\caption{Contours of heat release rate in a plane near the surface compared to observations of CSIRO Grassland Fires F19 (left) and C064 (right).  FDS contour times for Case C064 have been shifted uniformly by 10 s to line up the initial head fire observation and compare the subsequent spread rate.}
-\label{fig:CaseF19_contours}
 \end{figure}
 
 Snapshots of the Lagrangian particle simulation of Case~F19 compared to photographs of the experiment are shown in Fig.~\ref{F19}. The plot of grass is 200~m by 200~m and the computational domain is 240~m by 240~m by 20~m high. The grid cells are 0.5~m cubes. The domain is subdivided into 36 individual meshes and run in parallel. A blade of grass is represented by a single cylindrically-shaped particle within a grid cell. The radius of the cylinder is derived from the measured surface area to volume ratio of the grass. Each simulated blade of grass represents many more actual blades of grass. The weighting factor is determined from the measured bulk mass per unit area. The fires in the experiments were ignited by two field workers carrying drip torches walking in opposite directions along the upwind boundary of the plot (the red strip in Fig.~\ref{F19}). In FDS, this action was modeled using a specified spread rate along the strip.
@@ -582,17 +578,17 @@ Snapshots of the Lagrangian particle simulation of Case~F19 compared to photogra
 \label{Properties_Grasses}
 \begin{tabular}{|l|c|c|c|}
 \hline
-Property                        & Units         & Case F19      & Case C064     \\ \hline \hline
-Wind Speed                      & m/s           & 4.8           & 4.6           \\ \hline
-Ambient Temperature             & $^\circ$C     & 34            & 32            \\ \hline
-Surface Area to Volume Ratio    & m$^{-1}$      & 12240         & 9770          \\ \hline
-Grass Height                    & m             & 0.51          & 0.21          \\ \hline
-Bulk Mass per Unit Area         & kg/m$^2$      & 0.313         & 0.283         \\ \hline
-Moisture Fraction               & \%            & 5.8           & 6.3           \\ \hline
-Measured ROS                    & m/s           & 1.5           & 1.1           \\ \hline
-Calculated ROS, Particle Method (0.25 m, 0.5 m, 1.0 m resolution) & m/s           & 1.4, 1.3, 1.4           & 1.1, 1.2, 1.2          \\ \hline
-Calculated ROS, Boundary Fuel Method (0.25 m, 0.5 m, 1.0 m resolution) & m/s      & 1.5, 1.4, 1.7           & 1.3, 1.3, 1.3           \\ \hline
-Calculated ROS, Level Set Method (5 m, 10 m, 20 m resolution) & m/s          & 1.1, 1.1, 1.2          & 0.4, 0.5, 0.8          \\ \hline
+Property                        & Units        & Case C064 & Case F19    \\ \hline \hline
+Wind Speed                      & m/s          & 4.6       & 4.8         \\ \hline
+Ambient Temperature             & $^\circ$C    & 32.       & 34          \\ \hline
+Surface Area to Volume Ratio    & m$^{-1}$     & 9770      & 12240       \\ \hline
+Grass Height                    & m            & 0.21      & 0.51        \\ \hline
+Bulk Mass per Unit Area         & kg/m$^2$     & 0.283     & 0.313       \\ \hline
+Moisture Fraction               & \%           & 6.3       & 5.8         \\ \hline
+Measured RoS                    & m/s          & 1.1       & 1.5         \\ \hline
+Calc'd RoS, Particle Method (0.25 m, 0.5 m, 1.0 m resolution) & m/s           & 1.4, 1.3, 1.4           & 1.1, 1.2, 1.2          \\ \hline
+Calc'd RoS, Boundary Fuel Method (0.25 m, 0.5 m, 1.0 m resolution) & m/s      & 1.5, 1.4, 1.7           & 1.3, 1.3, 1.3           \\ \hline
+Calc'd RoS, Level Set Method (5 m, 10 m, 20 m resolution) & m/s          & 1.1, 1.1, 1.2          & 0.4, 0.5, 0.8          \\ \hline
 \end{tabular}
 \end{center}
 \end{table}
@@ -612,7 +608,16 @@ Calculated ROS, Level Set Method (5 m, 10 m, 20 m resolution) & m/s          & 1
 
 The simulations have been conducted with the three different fire spread models, and each case has been run with three levels of spatial resolution. The simulations using the Particle and Boundary Fuel Models have been run with cubic grid cells that are 0.25~m, 0.5~m, and 1~m on a side. The simulations using the Level Set Model are run with cells of 5~m, 10~m, and 20~m. The predicted rates of spread for the two cases are listed in Table~\ref{Properties_Grasses} and shown graphically in Fig.~\ref{CSIRO}. For these simulations, the rate of spread predicted by the Particle and Boundary Fuel Models are comparable to the measured rate of spread while the level set method under-predicts the RoS. The under-prediction by the level set simulations is a consequence of the choice of fuel model, and one should not draw any conclusions as to the performance of level sets versus the other two rate of spread methods.
 
-It is difficult to compare the Particle and Boundary Fuel simulations with those conducted by Mell et al. in 2007~\cite{Mell:IJWF2007}. The underlying numerical model, FDS, has undergone a major revision over the past decade, changing the basic finite-difference scheme, boundary conditions, drag modeling, and so on, and the vegetation-specific models have changed as well, most notably the charring reaction. In addition, the amount of information about the grasses and field conditions is limited, and the thermal and kinetic parameters are gleaned from various sources and are generally average values over a wide range of vegetation types. A sensitivity study~\cite{McGrattan:CI2017} for the particle model simulations reveals that near-surface wind speed is the has the most direct effect on the RoS, and the combined effect of the dozens of thermal, kinetic, and numerical parameters would certainly explain the difference in RoS. 
+\begin{figure}[ht]
+\includegraphics[width=0.49\textwidth]{figures/Case_C064_flame_position.pdf}
+\includegraphics[width=0.49\textwidth]{figures/Case_F19_flame_position.pdf}
+\caption{Contours of heat release rate in a plane near the surface from the fine resolution (0.25 m) Particle Model compared to observations of CSIRO Grassland Fires C064 (left) and F19 (right).}
+\label{fig:CaseF19_contours}
+\end{figure}
+
+Figure \ref{fig:CaseF19_contours} shows contours of heat release rate near the surface compared to the observed flame front for the high resolution (0.25 m) Particle Model.  These contours may be compared to the head fire spread rates at the top of Fig.~\ref{CSIRO}.  Case F19 contours are shown on the right and may be compared to the flame images in Fig.~\ref{F19}.  These results show some improvement to the flank fire spread rates compared to previous simulations with FDS conducted by Mell et al.~in 2007~\cite{Mell:IJWF2007}.
+
+However, it is difficult to compare the present results with those from \cite{Mell:IJWF2007}. The underlying numerical model, FDS, has undergone a major revision over the past decade, changing the basic finite-difference scheme, boundary conditions, drag modeling, and so on, and the vegetation-specific models have changed as well, most notably the charring reaction. In addition, the amount of information about the grasses and field conditions is limited, and the thermal and kinetic parameters gleaned from various sources and are generally average values over a wide range of vegetation types. A sensitivity study~\cite{McGrattan:CI2017} for the particle model simulations reveals that near-surface wind speed has the most direct effect on the rate of spread (RoS), and the combined effect of the dozens of thermal, kinetic, and numerical parameters would certainly explain the difference in RoS between the 2007 results and those of this study. 
 
 
 \begin{table}[ht]
@@ -650,9 +655,9 @@ Soil Density                    & kg/m$^3$              & 1300                  
 \subsection{Complex Terrain Fire Spread}  
 \label{sec:cogo}
 
-This section presents an example of the methodologies discussed in the paper. It is notable because it considers an actual fire that occurred in the urban-wildland interface, which presents a challenge for a fire spread model because the surface vegetation is mixed with the built environment.
+This section presents an example of the methodologies discussed in the paper. It is notable because it considers an actual fire that occurred in the wildland-urban interface (WUI), which presents a challenge for a fire spread model because the surface vegetation is mixed with the built environment.
 
-At approximately 23:00 (local time) on March 25, 2019, a wildfire started in the seaside town of Cogoleto, near Genova, Italy. Strong winds, gusting up to 100~km/h from the North, spread the fire from its ignition point due to a faulty electric line on a ridge above the town towards the sea. Several houses were destroyed, hundreds of residents had to be evacuated, the firefighter crews worked for three days to tame the flames, no casualties were reported.
+At approximately 23:00 (local time) on March 25, 2019, a wildfire started in the seaside town of Cogoleto, near Genoa, Italy. Strong winds, gusting up to 100~km/h from the north, spread the fire from its ignition point towards the sea. The fire was caused by a faulty power line on a ridge above the town. Several houses were destroyed and hundreds of residents had to be evacuated. The burnt region measured over 1~km from origin to farthest point. The fire burned overnight and into the next day. Up to 70 firefighters worked at the scene, with help from helicopters and fire hydrants. Suppression efforts were directed towards stopping the fire spread into the coastal town of Cogoleto.
 
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{figures/cogoleto_fire_2019_ls4_1000.png}
@@ -660,17 +665,17 @@ At approximately 23:00 (local time) on March 25, 2019, a wildfire started in the
 \label{Cogoleto_satellite}
 \end{figure}
 
-Shown in Fig.~\ref{Cogoleto_satellite} are the results of a level set simulation of the fire superimposed on a satellite photograph of the area and the outline of the extent of the actual fire.
+Shown in Fig.~\ref{Cogoleto_satellite} are the results of a level set simulation of the fire superimposed on a satellite photograph of the area and the outline of the extent of the actual fire. The computational domain is assembled using the open-source GIS (Geographic Information System) program called QGIS~\cite{QGIS}, extended by the qgis2fds~\cite{qgis2fds} plugin. The open-source qgis2fds plugin was specifically developed in the framework of the WUIFI-21 project\footnote{WUIFI-21: {\it High fidelity computational fluid dynamics modeling of forest fires for Wildland-Urban Interface communities resilience and protection}, an Italy-US research project financed by the Italian Ministry of Foreign Affairs and International Cooperation} for facilitating the use of geographical data for forest fire simulation and smoke pollutants dispersion in FDS.
 
-The computational domain is assembled using the open-source GIS (Geographic Information System) program called QGIS~\cite{QGIS}, extended by the qgis2fds~\cite{qgis2fds} plugin. The open-source qgis2fds plugin was specifically developed in the framework of the WUIFI-21 project\footnote{WUIFI-21: {\it High fidelity computational fluid dynamics modeling of forest fires for Wildland-Urban Interface communities resilience and protection}, an Italy-US research project financed by the Italian Ministry of Foreign Affairs and International Cooperation} for facilitating the use of geographical data for forest fire simulation and smoke pollutants dispersion in FDS.
+The wind speed and direction are based on a single weather station near the point of ignition. Winds recorded were found predominantly coming from the north with magnitudes that ranged from 20~m/s during the night diminishing to 5~m/s towards the morning hours. The vegetation type is provided by a database maintained at the CIMA\footnote{International Centre on Environmental Monitoring.} Research Foundation, derived from regional forest management maps. In the simulation, the single point wind data is taken as the prevailing wind, and the local wind field is obtained via the CFD computation. The fire is simulated based on the position of the level set front; that is, when the front arrives at a given location, a fire is ignited and burns for a duration of time consistent with the specified fuel loading of that particular point on the map. 
 
-The wind speed and direction are based on a single weather station near the point of ignition. The vegetation type is provided by a database maintained at the CIMA\footnote{International Centre on Environmental Monitoring.} Research Foundation, derived from regional forest management maps. In the simulation, the single point wind data is taken as the prevailing wind, and the local wind field is obtained via a CFD computation. The fire is simulated based on the position of the level set front; that is, when the front arrives at a given location, a fire is ignited and burns for a duration of time consistent with the specified fuel loading of that particular point on the map. 
-
-The extent of the simulated fire, shown in green in Fig.~\ref{Cogoleto_satellite}, is greater than the actual fire, shown in red. This is not surprising given that the simulation does not include fire suppression and the rate of spread of the level set front is determined empirically for vegetation that may not exactly resemble that of this particular region. 
+The extent of the simulated fire, shown in green in Fig.~\ref{Cogoleto_satellite}, is greater than that of the actual fire, shown in red. This is not surprising given that the simulation does not include suppression and the rate of spread of the level set front is determined based on vegetation that may not exactly resemble that of this particular region. It is important to note that for the level set method, a fire break created by first responders can be modeled as a region declared as "non-combustible." The 13 Rothermel fuel types have been supplemented by areas such as water, pavement, and other non-combustibles. The fire front determined by the level set calculation is stopped by the non-combustible area, highlighting the challenge in simulating firebrand spot ignitions that were reported by first responders at the scene.
 
 The simulation results have been compared with those obtained from CIMA Propagator~\cite{Trucchia:2020}, an experimental propagation model that has provided several European civil protection organizations with real-time fire predictions since 2009. The model has been implemented by the CIMA Foundation, its propagation model is based on stochastic cellular automata.
 
-The two models produce a qualitatively similar patterns of fire spread, mainly because the vicinity of the fire has numerous areas that are considered ``non-combustible,'' that is, devoid of vegetation or structures. This points out the problem of ``validating'' wildfire models. The simulations of the flat terrain grassland fire experiments described in the previous section match fairly well the observed fire behavior, but in these cases, the vegetation is uniform and fairly well described in terms of its mass loading and geometrical characteristics, the terrain is flat and of relatively small area, the wind is steady, and the experiment lasts a few minutes. In a real fire, none of this will be true. The detailed physics of the fire are not resolvable on a relatively coarse grid, the vegetation is inhomogeneous, sparse, and sometimes unknown, the weather conditions are varying, there are suppression efforts with water and the setting of backfires, and the fires can burn for days. All of which raise the question as to what level of physical fidelity ought to be required in these models. The strategy that has been adopted in FDS is to accommodate simulation options ranging from a level set calculation of fire spread over tens of kilometers that can be run in minutes, similar to models like BEHAVE developed by the U.S. Forest Service, all the way to detailed simulations of fire spread at sub-meter resolution for relatively short time periods (minutes to hours) and small areas (tens of hectares). As was the case for models developed for building fires thirty years ago, it is not clear at the moment exactly how these wildland fire models will be used in the future. The best strategy is to advance the various modeling options until a clear path forward becomes apparent.
+The two models produce a qualitatively similar patterns of fire spread, mainly because the vicinity of the fire has numerous areas that are considered ``non-combustible,'' that is, devoid of vegetation or structures. This points out the problem of ``validating'' wildfire models. The simulations of the flat terrain grassland fire experiments described in the previous section match fairly well the observed fire behavior, but in those cases, the vegetation is uniform and fairly well described in terms of its mass loading and geometrical characteristics, the terrain is flat and of relatively small area, the wind is steady, and the experiment lasts a few minutes. In a real fire, none of this will be true. The detailed physics of the fire are not resolvable on a relatively coarse grid, the vegetation is heterogeneous, sparse, and sometimes unknown, the weather conditions are varying, there are suppression efforts with water and the setting of backfires, and the fires can burn for days.
+
+All of which raise the question as to what level of physical fidelity ought to be required in these models. The strategy that has been adopted in FDS is to accommodate simulation options ranging from a level set calculation of fire spread over tens of kilometers that can be run in minutes, similar to models like FARSITE developed by the U.S. Forest Service, all the way to detailed simulations of fire spread at sub-meter resolution for relatively short time periods (minutes to hours) and small areas (tens of hectares). As was the case for models developed for building fires thirty years ago, it is not clear at the moment exactly how these wildland fire models will be used in the future. The best strategy is to advance the various modeling options until a clear path forward becomes apparent.
 
 
 \section{Summary} \label{sec:summary}
@@ -705,3 +710,4 @@ The numerical methods described in this paper span the range of length scales fr
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
 
+https://www.overleaf.com/project/5f9825767d349c000144f040

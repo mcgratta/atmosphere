@@ -32,24 +32,29 @@ What is lacking here are:
    
    \item Information about the scale of the event: how large was the fire from origin to furthest point, how long it took to reach the final perimeter. A scale on the figure 4 would be helpful. 
    
-   From origin to furthest point measured distance is ~ 1200 m.  
-   
+   \hl{This info was obtained from the simulation domain. From origin to furthest point measured distance is about 1200 m. The fire run overnight and onto the next day.} 
    
    \item Wind context: was the single measurement consistent both in speed and direction throughout the event. How representative was this single point measurement, given the second closest weather station and how that data compared. was the station at a specific location (ravine or local acceparation zone). I can tell you that in CA, in the Camp Fire (as an example here) 5 -8 km can make all the difference in the world (100 km/h vs 10 km/h)
    
-   
+   \hl{From the information provided from CIMA : Winds recorded at nearby sensor station were found predominantly coming from the north with magnitudes that ranged from 20 m/sec during the night and diminished to 5 m/sec towards the morning hours.}
    
    \item information on defensive actions. Defensive actions not only impact the final perimeter but can also impact the direction as firefighters typically try to direct the fire away from high value targets. This can be done with both ground and aerial resources. I do not know what was used and when.
 
-
+   \hl{Information from https://www.thelocal.it/20190326/residents-evacuated-as-wildfires-take-hold-near-genoa : Up to 70 firefighters worked at the scene, with help from helicopters and fire hydrants. Suppression work was directed into stopping fire spread into the coastal town of Cogoleto.}
 
    \item There is no time scale provided on the runs or event progression so it is very difficult to judge what is presented.
 
    \item There is no mention of spotting within the fire perimeter and also outside. Short, intermediate and far field spotting can play critical roles in the evolution of a wildfire and/or WUI incident and in my mind is one of the key issues that realistically limits the applicability of predictive tools on that scale. Since we cannot resolve where embers will result in ignitions and the location of the actual ignitions can have dramatic impact on how the event develops, not knowing limits the usefulness of these tools. A probabilistic approach does not improve the usefulness in my mind.
 
+   \hl{Ema, private communication : There's been a lot of spotting. Added : Further, spot ignition was reported by first responders at the scene, a common fire spread mechanism that remains a major issue in wildfire modeling.}
+
    \item Explicit listing of the model limitations of dealing with fuel breaks both natural and manmade. While I appreciate that if the wind was truly 100km/h fuel breaks may have had little impact on the overall fire spread, the effect on fuel breaks can still provide critical information to understanding how fire behaved and should be discussed. 
 
+    \hl{Kevin : For the particle and boundary fuel models of flame spread, fuel breaks are handled directly by removing combustible vegetation from the model. For the level set method, a fire break is a region declared as "non-combustible." The 13 Rothermel fuel types have been supplemented by "water", "ice", "pavement" and various other non-combustible regions that would be tiled onto our terrain map.}
+
    \item I would also like to see some statement explicitly addressing the complexity of dealing with non-uniform fuels (not only vegetative but also WUI). Even using the level set approach one needs to be mindful of the potential change in fire spread as the fire migrates between different fuels.
+
+   \hl{Non-uniform fuels : Adressed in the statement on the complexity of simulation real WUI fires (last paragraph of cogoleto section.)}
 
 \end{itemize}
 
