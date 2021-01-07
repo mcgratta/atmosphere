@@ -1,0 +1,44 @@
+\documentclass[12pt]{article}
+
+\setlength{\textwidth}{6.25in}
+\setlength{\textheight}{8.75in}
+\setlength{\topmargin}{0.in}
+\setlength{\headheight}{0.in}
+\setlength{\headsep}{0.in}
+\setlength{\parindent}{0.in}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\parskip}{\baselineskip}
+\setlength{\leftmargini}{\parindent} % Controls the indenting of the "bullets" in a list
+
+\usepackage{xcolor}
+\newcommand\hl[1]{\textcolor{red}{#1}}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+{\bf Response to comments by Reviewer of Revision 1}
+\end{center}
+
+Compared to the first review, the authors accounted for many raised comments. In particular, the used models are now well described. However, even the authors agree that this work allows drawing a clear conclusion, in particular on the section 6.1 on the observed poor relevance of the level set method.
+
+\hl{How well the level set based predictions agree with an observed fire perimeter evolution depends mostly on the value of head fire spread rate model. The head fire spread rate can be obtained in a number of ways, such as empirical models, semi-empirical models, or simulations the are more physics-based. The simulations presented in this paper use the Rothermel model to obtain the head fire spread rate. This semi-empirical model is based mostly on measurements from laboratory-scale simulations. It's well known that, for many applications, the Rothermel model requires calibration (which we did not do). At this point in its development, FDS uses the Rothermel model as a placeholder for obtaining the head fire spread rate. This is in-line with other CFD based approaches that use a front-tracking approach. For this reason, it is not expected that the level set simulations presented here will agree well with observations of Australian grass fires. We have added this discussion and references to other CFD approaches that use the Rothermel model and a reference that provides an example of the need to calibrate the Rothermel model.}
+
+Indeed, two main elements (among others) could explain the observed discrepancies with the more realistic solid particles or the boundary fuel method: the coarse discretization or the imposed (and Indeed difficult to calibrate) RoS value. Without providing more hints on this problem and complementary simulations to discriminate between these two effects, in my opinion this paper could hardly be published. I fully understand that the author's aim is difficult and corresponds to an open question, so I have a couple of suggestions:
+
+- Has the level set method a strong dependence w.r.t. the grid cell size, including cell sizes tending towards the ones used in the two first methods ?
+
+\hl{Sensitivity to the grid resolution is presented in Table 1. The level set model, when implemented with the head fire spread rate being dependent on the wind speed, can depend on the grid resolution because the wind can depend on the grid resolution. The extent of this dependence is something that a model user needs to assess through grid sensitivity tests. However, the under prediction of the head fire spread rate seen here are due to, as discussed above, error in the Rothermel model.}
+
+- Is it possible to use  the well refined simulations to chacterize a RoS and the include it in the level set approach to see if the results are more relevant ?
+
+\hl{If by ``well refined simulations" the reviewer is referring to using more physics-based simulations to determine a RoS for use in the level set approach then, yes, this is possible and work is being conducted along these lines. Text has been added to bring up this point.}
+
+Another (less important) point regards the SEM: why presenting it without using it for comparison ?
+
+\hl{OK, the SEM discussion has been removed.}
+
+
+\end{document}
