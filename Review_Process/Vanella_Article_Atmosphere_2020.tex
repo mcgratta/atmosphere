@@ -2,7 +2,7 @@
 %  In case you need support, please attach all files that are necessary for compiling as well as the log file, and specify the details of your LaTeX setup (which operating system and LaTeX version / tools you are using).
 
 %=================================================================
-\documentclass[journal,article,atmosphere,submit,moreauthors,pdftex]{Definitions/mdpi}
+\documentclass[journal,article,atmosphere,submit,moreauthors,pdftex]{Definitions_Review_Process/mdpi}
 
 % If you would like to post an early version of this manuscript as a preprint, you may use preprint as the journal and change 'submit' to 'accept'. The document class line would be, e.g., \documentclass[preprints,article,accept,moreauthors,pdftex]{mdpi}. This is especially recommended for submission to arXiv, where line numbers should be removed before posting. For preprints.org, the editorial staff will make this change immediately prior to posting.
 
@@ -282,7 +282,7 @@ Again, this simple approach is viable because FDS usually resolves the thermal f
 In Fig.~\ref{Fig:figure_1}, the terrain is represented by its surface triangulation within an FDS Cartesian mesh. Some Cartesian cells and faces belonging to this mesh are transversed by the terrain surface. The remaining polyhedra and polygons that lie on the gas side of these intersected geometries are called cut-cells and cut-faces. They discretize the fluid domain in the region surrounding the solid surface. A detail of this unstructured mesh is shown in Fig.~\ref{Fig:figure_1}. The resulting cut-cells and cut-faces are of varied sizes and shapes, and situations where there are more than one cut-cell per Cartesian cell are common. As described later, small cells impose a temporal stability constraint on explicit time integration schemes. A two-level grid refinement hierarchy emerges. The coarse level is defined by the Cartesian entities, whereas the fine level is defined by the cut-cell or unstructured components. Methods that solve discrete model equations on these grids are called cut-cell or embedded boundary methods~\cite{berger_2016}. Reliably defining the cut-cell mesh geometric properties and topology is a complex problem in and of itself, but beyond the scope of this paper.
 \begin{figure}[ht]
    \centering
-   \includegraphics[trim = 12mm 42mm 8mm 25mm, clip,width=1\linewidth]{./figures/SketchFig1.pdf}
+   \includegraphics[trim = 12mm 42mm 8mm 25mm, clip,width=1\linewidth]{../figures/SketchFig1.pdf}
    \put(-305,-5){(a)}
    \put(-95,-4){(b)}
    \caption{Sketch of regular Cartesian and cut-cell grids around terrain: (a) An unstructured cut-cell region is defined on the gas phase side around a terrain $\mathbf{T}$. (b) Detail showing a slice representative of cut-cells and regular gas cells, terrain triangulation and two refinement level interpretation.}
@@ -311,7 +311,7 @@ where $V_{ii}$ is the volume of cell $ii$ and the overlines imply cell averages.
 The integral over the cut-cell volume has been transformed in an area integral on its $n_{\rm f}=5$ faces using the divergence theorem. As these $k$ faces with areas $A_k$ and outward normals $\hat{\mathbf{n}}_{ii,k}$ are planar by construction, the method for evaluation of their mean diffusive fluxes $\left( - \rho D_\alpha \boldsymbol{\nabla} Y_\alpha \right)_k$ will define the spatial accuracy of the discretization. Centroid to centroid (i.e. $\Delta x_{\rm cc}$ in Fig.~\ref{Fig:figure_2}) finite differences and linear interpolation are used to approximate $\boldsymbol{\nabla} Y_\alpha$ and $\rho D_\alpha$ for each face belonging to the gas phase. Also, a normal probe approach~\cite{balaras_2004}, is employed to sample information from the fluid to define fluxes in boundary cut-faces. In a normal probe method, an external point is defined at a normal distance from the body of the order of the cartesian grid size. Then, information from the fluid at this external point is obtained via interpolation. 
 \begin{figure}[ht]
    \centering
-   \includegraphics[trim = 30mm 42mm 35mm 45mm, clip,width=1\linewidth]{./figures/SketchFig2.pdf}
+   \includegraphics[trim = 30mm 42mm 35mm 45mm, clip,width=1\linewidth]{../figures/SketchFig2.pdf}
    \put(-335,-5){(a)}
    \put(-95,-4){(b)}
    \caption{Sketch of cut-cell and faces: (a) Cut-cell $ii$ surrounded by gas phase regular and cut-faces (3-5), and boundary cut-faces (1-2).  (b) Interpolation sketch for wall modeled immersed boundary reconstruction of cut-face velocities.}
